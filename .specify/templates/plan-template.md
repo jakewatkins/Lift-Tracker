@@ -47,7 +47,17 @@
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+**Clean Architecture & SOLID Principles**: Does the planned architecture follow clean architecture patterns with clear separation of concerns? Are SOLID principles maintained in the design?
+
+**Test-First Development**: Are test tasks properly planned before implementation tasks? Do test coverage requirements (80% unit, 70% integration) align with the implementation plan?
+
+**User Experience Consistency**: For UI features, are design system compliance, accessibility (WCAG 2.1 AA), and responsive design requirements addressed?
+
+**Security-First Implementation**: Are security reviews planned for authentication, data handling, and external integrations? Is dependency vulnerability scanning included?
+
+**Performance Excellence**: Are performance benchmarks defined (<2s load time, <500ms navigation, <100ms DB queries)? Is profiling included for performance-critical features?
+
+**Quality Assurance**: Are naming conventions, code style enforcement, and documentation requirements addressed in the plan?
 
 ## Project Structure
 
@@ -216,4 +226,4 @@ directories captured above]
 - [ ] Complexity deviations documented
 
 ---
-*Based on Constitution v2.1.1 - See `/memory/constitution.md`*
+*Based on Constitution v1.0.0 - See `.specify/memory/constitution.md`*
