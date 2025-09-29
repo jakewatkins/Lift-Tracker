@@ -8,14 +8,16 @@
 ## User Scenarios & Testing *(mandatory)*
 
 ### Primary User Story
-As a fitness enthusiast, I want to comprehensively track my daily workouts including both strength training lifts and metabolic conditioning (metcon) sessions, so that I can monitor my progress, identify patterns, and optimize my training over time.
+As a fitness enthusiast, I want to create my own account and comprehensively track my daily workouts including both strength training lifts and metabolic conditioning (metcon) sessions, so that I can monitor my personal progress, identify patterns, and optimize my training over time while keeping my data private from other users.
 
 ### Acceptance Scenarios
-1. **Given** I have completed a workout session, **When** I open the application, **Then** I can create a new workout entry for today's date
-2. **Given** I am logging a strength lift, **When** I select the lift type (e.g., back squat), **Then** I can specify the set structure (sets/reps, EMOM, AMRAP), weight used, duration, and add comments
-3. **Given** I am logging a metcon workout, **When** I select the metcon type (AMRAP, for time, EMOM, TABATA), **Then** I can record the movements performed, reps completed, weights used, and add notes
-4. **Given** I have been using the app for several weeks, **When** I view my progress, **Then** I can see trends in my lift performance and metcon times over time
-5. **Given** I complete multiple lifts and metcons in one session, **When** I save the workout, **Then** all exercises are grouped together as a single day's training session
+1. **Given** I am a new user, **When** I access the application, **Then** I can create an account by providing only my name and email address
+2. **Given** I have created an account, **When** I log in, **Then** I can only see my own workout data and it remains completely separate from other users
+3. **Given** I have completed a workout session, **When** I open the application, **Then** I can create a new workout entry for today's date
+4. **Given** I am logging a strength lift, **When** I select the lift type (e.g., back squat), **Then** I can specify the set structure (sets/reps, EMOM, AMRAP), weight used, duration, and add comments
+5. **Given** I am logging a metcon workout, **When** I select the metcon type (AMRAP, for time, EMOM, TABATA), **Then** I can record the movements performed, reps completed, weights used, and add notes
+6. **Given** I have been using the app for several weeks, **When** I view my progress, **Then** I can see trends in my lift performance and metcon times over time
+7. **Given** I complete multiple lifts and metcons in one session, **When** I save the workout, **Then** all exercises are grouped together as a single day's training session
 
 ### Edge Cases
 - **Invalid weight/rep entries**: System accepts only positive numbers for weights and reps. Fractional weights limited to .25, .5, and .75 increments. Other fractions automatically round up to nearest acceptable value.
@@ -45,30 +47,32 @@ As a fitness enthusiast, I want to comprehensively track my daily workouts inclu
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
-- **FR-001**: System MUST allow users to create new workout sessions for any given date
-- **FR-002**: System MUST provide a comprehensive list of strength lifts (back squat, front squat, bench press, deadlift, etc.)
-- **FR-003**: System MUST support multiple set structures for lifts (standard sets/reps, EMOM, AMRAP, time-based sets)
-- **FR-004**: System MUST allow recording of weight, duration, and comments for each lift set
-- **FR-005**: System MUST provide metcon workout types (AMRAP, for time, EMOM, TABATA)
-- **FR-006**: System MUST allow recording of movements, reps, weights, and notes for metcon workouts
-- **FR-007**: System MUST support multiple lifts and metcons within a single workout session
-- **FR-008**: System MUST persist all workout data for historical tracking
-- **FR-009**: System MUST display progress trends for individual lifts over time via simple graphs
-- **FR-010**: System MUST display progress trends for metcon performance over time via simple graphs
-- **FR-011**: System MUST validate numeric inputs accepting only positive numbers for weights and reps
-- **FR-012**: System MUST support fractional weights in .25, .5, and .75 increments, rounding other fractions up to nearest acceptable value
-- **FR-013**: System MUST allow editing of previously entered workout data
-- **FR-014**: System MUST allow multiple entries of the same exercise type within a single workout session
-- **FR-015**: System MUST save incomplete workout entries with missing numbers defaulting to 0 and empty strings for text fields
-- **FR-016**: System MUST display progress independently of workout frequency or gaps in exercise history
-- **FR-017**: System MUST support bodyweight exercises with weight value of 0, while allowing additional weight for weighted variants
-- **FR-018**: System MUST record time values in minutes with fractional increments of .25, .5, and .75, rounding other fractions up
-- **FR-019**: System MUST record rest intervals between sets in minutes with same fractional limitations as time values
-- **FR-020**: System MUST support distance-based measurements for cardio exercises (runs, biking, rowing)
-- **FR-021**: System MUST support rep-based counting for bodyweight metcon movements (burpees, box jumps, etc.)
-- **FR-022**: System MUST use meters as the standard unit for all distance measurements
-- **FR-023**: System MUST support progress chart visualization with 30-day, 60-day, and 90-day time range options
-- **FR-024**: System MUST interpret weight values for bodyweight exercises as additional weight beyond bodyweight (e.g., 25# = bodyweight + 25 pounds)
+- **FR-001**: System MUST provide user account creation and management requiring only name and email address for registration
+- **FR-002**: System MUST ensure each user's workout data is completely isolated and private from other users
+- **FR-003**: System MUST allow users to create new workout sessions for any given date
+- **FR-004**: System MUST provide a comprehensive list of strength lifts (back squat, front squat, bench press, deadlift, etc.)
+- **FR-005**: System MUST support multiple set structures for lifts (standard sets/reps, EMOM, AMRAP, time-based sets)
+- **FR-006**: System MUST allow recording of weight, duration, and comments for each lift set
+- **FR-007**: System MUST provide metcon workout types (AMRAP, for time, EMOM, TABATA)
+- **FR-008**: System MUST allow recording of movements, reps, weights, and notes for metcon workouts
+- **FR-009**: System MUST support multiple lifts and metcons within a single workout session
+- **FR-010**: System MUST persist all workout data for historical tracking
+- **FR-011**: System MUST display progress trends for individual lifts over time via simple graphs
+- **FR-012**: System MUST display progress trends for metcon performance over time via simple graphs
+- **FR-013**: System MUST validate numeric inputs accepting only positive numbers for weights and reps
+- **FR-014**: System MUST support fractional weights in .25, .5, and .75 increments, rounding other fractions up to nearest acceptable value
+- **FR-015**: System MUST allow editing of previously entered workout data
+- **FR-016**: System MUST allow multiple entries of the same exercise type within a single workout session
+- **FR-017**: System MUST save incomplete workout entries with missing numbers defaulting to 0 and empty strings for text fields
+- **FR-018**: System MUST display progress independently of workout frequency or gaps in exercise history
+- **FR-019**: System MUST support bodyweight exercises with weight value of 0, while allowing additional weight for weighted variants
+- **FR-020**: System MUST record time values in minutes with fractional increments of .25, .5, and .75, rounding other fractions up
+- **FR-021**: System MUST record rest intervals between sets in minutes with same fractional limitations as time values
+- **FR-022**: System MUST support distance-based measurements for cardio exercises (runs, biking, rowing)
+- **FR-023**: System MUST support rep-based counting for bodyweight metcon movements (burpees, box jumps, etc.)
+- **FR-024**: System MUST use meters as the standard unit for all distance measurements
+- **FR-025**: System MUST support progress chart visualization with 30-day, 60-day, and 90-day time range options
+- **FR-026**: System MUST interpret weight values for bodyweight exercises as additional weight beyond bodyweight (e.g., 25# = bodyweight + 25 pounds)
 
 ### Non-Functional Requirements
 - **NFR-001**: Workout entry forms MUST load within 2 seconds for responsive user experience
@@ -77,7 +81,8 @@ As a fitness enthusiast, I want to comprehensively track my daily workouts inclu
 - **NFR-004**: Data entry forms MUST be optimized for both desktop and mobile interfaces
 
 ### Key Entities *(include if feature involves data)*
-- **Workout Session**: A collection of exercises performed on a specific date, containing one or more lifts and/or metcons
+- **User Account**: Represents an individual user with name and email address for identification and data isolation
+- **Workout Session**: A collection of exercises performed on a specific date by a user, containing one or more lifts and/or metcons
 - **Strength Lift**: An individual strength training exercise with type, set structure, weights, duration, rest intervals, and comments
 - **Metcon Workout**: A metabolic conditioning exercise with type, movements, reps/distance, weights, time, and notes  
 - **Exercise Type**: Predefined categories for lifts (squat, bench, deadlift) and metcon types (AMRAP, EMOM, etc.)
@@ -115,7 +120,7 @@ As a fitness enthusiast, I want to comprehensively track my daily workouts inclu
 - [x] Key concepts extracted
 - [x] All ambiguities resolved through user clarification
 - [x] User scenarios defined
-- [x] Requirements generated and finalized (24 functional requirements)
+- [x] Requirements generated and finalized (26 functional requirements)
 - [x] Entities identified and updated
 - [x] Review checklist passed - specification complete
 
