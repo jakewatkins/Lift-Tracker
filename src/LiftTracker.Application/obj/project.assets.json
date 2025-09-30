@@ -1,0 +1,105 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "LiftTracker.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/LiftTracker.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LiftTracker.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LiftTracker.Domain/1.0.0": {
+      "type": "project",
+      "path": "../LiftTracker.Domain/LiftTracker.Domain.csproj",
+      "msbuildProject": "../LiftTracker.Domain/LiftTracker.Domain.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "LiftTracker.Domain >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/Users/jakewatkins/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/LiftTracker.Application.csproj",
+      "projectName": "LiftTracker.Application",
+      "projectPath": "/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/LiftTracker.Application.csproj",
+      "packagesPath": "/Users/jakewatkins/.nuget/packages/",
+      "outputPath": "/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/Users/jakewatkins/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {
+            "/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Domain/LiftTracker.Domain.csproj": {
+              "projectPath": "/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Domain/LiftTracker.Domain.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.17, 8.0.17]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.17, 8.0.17]"
+          }
+        ],
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.301/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

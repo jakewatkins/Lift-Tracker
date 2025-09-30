@@ -1,0 +1,16 @@
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/bin/Debug/net8.0/LiftTracker.Application.deps.json
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/bin/Debug/net8.0/LiftTracker.Application.dll
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/bin/Debug/net8.0/LiftTracker.Application.pdb
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/bin/Debug/net8.0/LiftTracker.Domain.dll
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/bin/Debug/net8.0/LiftTracker.Domain.pdb
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTracker.Application.csproj.AssemblyReference.cache
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTracker.Application.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTracker.Application.AssemblyInfoInputs.cache
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTracker.Application.AssemblyInfo.cs
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTracker.Application.csproj.CoreCompileInputs.cache
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTracker.Application.sourcelink.json
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTrac.EBF0174A.Up2Date
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTracker.Application.dll
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/refint/LiftTracker.Application.dll
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/LiftTracker.Application.pdb
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Application/obj/Debug/net8.0/ref/LiftTracker.Application.dll
