@@ -1,9 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Text;
+using System.Text.Json;
 using Serilog;
+using Serilog.Events;
 using LiftTracker.Infrastructure.Data;
 using LiftTracker.Domain.Interfaces;
 using LiftTracker.Infrastructure.Repositories;
@@ -12,8 +17,23 @@ using LiftTracker.Infrastructure.Logging;
 using LiftTracker.Application.Interfaces;
 using LiftTracker.Application.Services;
 using LiftTracker.API.Middleware;
+using LiftTracker.API.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Enhanced configuration setup
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables("LIFTTRACKER_")
+    .AddCommandLine(args);
+
+// Configure strongly-typed configuration options
+builder.Services.Configure<ApplicationOptions>(
+    builder.Configuration.GetSection(ApplicationOptions.SectionName));
+builder.Services.Configure<GoogleAuthOptions>(
+    builder.Configuration.GetSection(GoogleAuthOptions.SectionName));
 
 // Configure Serilog
 builder.Services.AddLogging(builder.Configuration, builder.Environment);
@@ -28,40 +48,77 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient", policy =>
     {
+        var clientUrl = builder.Configuration["ClientApp:BaseUrl"] ?? "https://localhost:5001";
+
         policy.WithOrigins(
-                builder.Configuration["ClientApp:BaseUrl"] ?? "https://localhost:5001",
+                clientUrl,
                 "https://localhost:5001",
-                "http://localhost:5000"
+                "http://localhost:5000",
+                "https://localhost:7001", // Common Blazor WASM dev ports
+                "http://localhost:7000"
             )
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials();
+            .AllowCredentials()
+            .SetIsOriginAllowedToAllowWildcardSubdomains();
     });
+
+    // Development-only policy for broader access
+    if (builder.Environment.IsDevelopment())
+    {
+        options.AddPolicy("Development", policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+    }
 });
 
 // Add controllers
 builder.Services.AddControllers();
 
-// Configure Google OAuth options
-builder.Services.Configure<GoogleAuthOptions>(
-    builder.Configuration.GetSection(GoogleAuthOptions.SectionName));
+// Configure HTTPS redirection
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
+    options.HttpsPort = builder.Environment.IsDevelopment() ? 7001 : 443;
+});
+
+// Configure HSTS (HTTP Strict Transport Security)
+builder.Services.AddHsts(options =>
+{
+    options.Preload = true;
+    options.IncludeSubDomains = true;
+    options.MaxAge = TimeSpan.FromDays(365);
+    options.ExcludedHosts.Clear(); // Remove default localhost exclusions in production
+});
 
 // Register authentication services
 builder.Services.AddHttpClient<GoogleAuthService>();
 builder.Services.AddScoped<JwtTokenService>();
 
-// Configure JWT authentication
-var googleAuthOptions = builder.Configuration.GetSection(GoogleAuthOptions.SectionName).Get<GoogleAuthOptions>();
-if (googleAuthOptions?.JwtKey != null)
+// Configure authentication with Google OAuth and JWT
+builder.Services.AddAuthentication(options =>
 {
-    var key = Encoding.UTF8.GetBytes(googleAuthOptions.JwtKey);
-    builder.Services.AddAuthentication(options =>
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+{
+    options.ClientId = builder.Configuration["GoogleAuth:ClientId"] ?? "";
+    options.ClientSecret = builder.Configuration["GoogleAuth:ClientSecret"] ?? "";
+    options.CallbackPath = "/api/auth/callback";
+    options.Scope.Add("email");
+    options.Scope.Add("profile");
+    options.SaveTokens = true;
+})
+.AddJwtBearer(options =>
+{
+    var googleAuthOptions = builder.Configuration.GetSection(GoogleAuthOptions.SectionName).Get<GoogleAuthOptions>();
+    if (googleAuthOptions?.JwtKey != null)
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
+        var key = Encoding.UTF8.GetBytes(googleAuthOptions.JwtKey);
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -88,8 +145,8 @@ if (googleAuthOptions?.JwtKey != null)
                 return Task.CompletedTask;
             }
         };
-    });
-}
+    }
+});
 
 builder.Services.AddAuthorization();
 
@@ -107,11 +164,26 @@ builder.Services.AddScoped<IStrengthLiftService, StrengthLiftService>();
 builder.Services.AddScoped<IMetconWorkoutService, MetconWorkoutService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 
-// Add AutoMapper (when mapping profile is created)
-// builder.Services.AddAutoMapper(typeof(LiftTracker.Application.Mappings.MappingProfile));
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(LiftTracker.Application.Mappings.UserMappingProfile));
 
-// Configure health checks (will be added later with proper package references)
-// builder.Services.AddHealthChecks();
+// Configure health checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<LiftTrackerDbContext>("database", HealthStatus.Unhealthy, new[] { "database" })
+    .AddCheck("api", () => HealthCheckResult.Healthy("API is running"), new[] { "api" })
+    .AddCheck("memory", () =>
+    {
+        var allocatedBytes = GC.GetTotalMemory(false);
+        var data = new Dictionary<string, object>
+        {
+            ["allocated"] = allocatedBytes,
+            ["gen0"] = GC.CollectionCount(0),
+            ["gen1"] = GC.CollectionCount(1),
+            ["gen2"] = GC.CollectionCount(2)
+        };
+        var status = allocatedBytes < 1024L * 1024L * 1024L ? HealthStatus.Healthy : HealthStatus.Degraded;
+        return HealthCheckResult.Healthy("Memory usage is normal", data);
+    }, new[] { "memory" });
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -180,6 +252,40 @@ if (app.Environment.IsDevelopment())
 // Global error handling middleware (must be first)
 app.UseErrorHandlingMiddleware();
 
+// Add security headers
+app.UseSecurityHeaders();
+
+// Add Serilog request logging
+app.UseSerilogRequestLogging(options =>
+{
+    // Customize request logging
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+    options.GetLevel = (httpContext, elapsed, ex) => ex != null
+        ? LogEventLevel.Error
+        : httpContext.Response.StatusCode > 499
+            ? LogEventLevel.Error
+            : LogEventLevel.Information;
+
+    // Enrich with additional context
+    options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+    {
+        diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+        diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+
+        if (httpContext.User.Identity is { IsAuthenticated: true })
+        {
+            diagnosticContext.Set("UserId", httpContext.User.FindFirst("sub")?.Value ??
+                                             httpContext.User.FindFirst("id")?.Value);
+        }
+    };
+});
+
+// HSTS (HTTP Strict Transport Security) - only in production
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
+
 app.UseHttpsRedirection();
 
 // CORS middleware
@@ -196,8 +302,40 @@ app.UseValidationMiddleware();
 // Configure controllers
 app.MapControllers();
 
-// Health check endpoint
-// app.MapHealthChecks("/health");
+// Health check endpoints
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = new
+        {
+            status = report.Status.ToString(),
+            timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+            environment = app.Environment.EnvironmentName,
+            checks = report.Entries.ToDictionary(
+                kvp => kvp.Key,
+                kvp => new
+                {
+                    status = kvp.Value.Status.ToString(),
+                    description = kvp.Value.Description,
+                    data = kvp.Value.Data,
+                    duration = kvp.Value.Duration.TotalMilliseconds,
+                    exception = kvp.Value.Exception?.Message
+                })
+        };
+        await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(result, new JsonSerializerOptions
+        {
+            WriteIndented = true
+        }));
+    }
+});
+
+// Basic health check endpoint
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false // Exclude all checks for liveness
+});
 
 // API info endpoint
 app.MapGet("/api/info", () => new

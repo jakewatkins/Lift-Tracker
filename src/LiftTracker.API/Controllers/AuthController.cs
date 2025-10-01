@@ -87,22 +87,11 @@ public class AuthController : ControllerBase
                 return BadRequest(new { error = "Incomplete user information" });
             }
 
-            // Check if user exists, create if not
-            var user = await _userService.GetUserByEmailAsync(email);
-            if (user == null)
-            {
-                _logger.LogInformation("Creating new user for email: {Email}", email);
-                var createUserDto = new LiftTracker.Application.DTOs.CreateUserDto
-                {
-                    Name = name,
-                    Email = email,
-                    GoogleId = googleId
-                };
-                user = await _userService.CreateUserAsync(createUserDto);
-            }
+            // Create or update user
+            var user = await _userService.CreateOrUpdateUserAsync(email, name);
 
             // Generate JWT token
-            var token = _jwtTokenService.GenerateToken(user.Id, user.Email, user.Name);
+            var token = _jwtTokenService.GenerateToken(user);
 
             _logger.LogInformation("User authenticated successfully: {UserId}", user.Id);
 
@@ -200,7 +189,7 @@ public class AuthController : ControllerBase
             return NotFound(new { error = "User not found" });
         }
 
-        var newToken = _jwtTokenService.GenerateToken(user.Id, user.Email, user.Name);
+        var newToken = _jwtTokenService.GenerateToken(user);
 
         return Ok(new { token = newToken });
     }

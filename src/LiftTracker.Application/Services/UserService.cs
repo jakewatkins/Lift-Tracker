@@ -30,14 +30,14 @@ public class UserService : IUserService
     public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Getting user by ID: {UserId}", userId);
-        
-        var user = await _userRepository.GetByIdAsync(userId);
-        
+
+        var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+
         if (user == null)
         {
             _logger.LogDebug("User not found with ID: {UserId}", userId);
         }
-        
+
         return user;
     }
 
@@ -45,14 +45,14 @@ public class UserService : IUserService
     public async Task<User?> GetUserByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Getting user by email: {Email}", email);
-        
-        var user = await _userRepository.GetByEmailAsync(email);
-        
+
+        var user = await _userRepository.GetByEmailAsync(email, cancellationToken);
+
         if (user == null)
         {
             _logger.LogDebug("User not found with email: {Email}", email);
         }
-        
+
         return user;
     }
 
@@ -72,8 +72,8 @@ public class UserService : IUserService
         var user = _mapper.Map<User>(createUserDto);
         user.Id = Guid.NewGuid();
 
-        var createdUser = await _userRepository.CreateAsync(user);
-        
+        var createdUser = await _userRepository.CreateAsync(user, cancellationToken);
+
         _logger.LogInformation("User created successfully with ID: {UserId}", createdUser.Id);
         return createdUser;
     }
@@ -83,7 +83,7 @@ public class UserService : IUserService
     {
         _logger.LogDebug("Updating user with ID: {UserId}", userId);
 
-        var existingUser = await _userRepository.GetByIdAsync(userId);
+        var existingUser = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (existingUser == null)
         {
             _logger.LogWarning("User not found for update with ID: {UserId}", userId);
@@ -91,7 +91,7 @@ public class UserService : IUserService
         }
 
         _mapper.Map(updateUserDto, existingUser);
-        var updatedUser = await _userRepository.UpdateAsync(existingUser);
+        var updatedUser = await _userRepository.UpdateAsync(existingUser, cancellationToken);
 
         _logger.LogInformation("User updated successfully with ID: {UserId}", userId);
         return updatedUser;
@@ -110,7 +110,7 @@ public class UserService : IUserService
         }
 
         var result = await _userRepository.DeleteAsync(userId);
-        
+
         if (result)
         {
             _logger.LogInformation("User deleted successfully with ID: {UserId}", userId);
@@ -124,10 +124,74 @@ public class UserService : IUserService
     }
 
     /// <inheritdoc />
+    public async Task<User> CreateOrUpdateUserAsync(string email, string name, CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("Creating or updating user with email: {Email}", email);
+
+        var existingUser = await _userRepository.GetByEmailAsync(email);
+        if (existingUser != null)
+        {
+            // Update existing user
+            existingUser.Name = name;
+            existingUser.UpdateLastLogin();
+            var updatedUser = await _userRepository.UpdateAsync(existingUser);
+            _logger.LogInformation("User updated successfully with ID: {UserId}", updatedUser.Id);
+            return updatedUser;
+        }
+        else
+        {
+            // Create new user
+            var user = new User(email, name);
+            user.UpdateLastLogin();
+
+            var createdUser = await _userRepository.CreateAsync(user);
+            _logger.LogInformation("User created successfully with ID: {UserId}", createdUser.Id);
+            return createdUser;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task UpdateLastLoginAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("Updating last login for user with ID: {UserId}", userId);
+
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found for last login update with ID: {UserId}", userId);
+            throw new InvalidOperationException($"User with ID {userId} not found");
+        }
+
+        user.UpdateLastLogin();
+        await _userRepository.UpdateAsync(user);
+
+        _logger.LogInformation("Last login updated successfully for user with ID: {UserId}", userId);
+    }
+
+    /// <inheritdoc />
+    public async Task<User> UpdateUserProfileAsync(Guid userId, string name, CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("Updating profile for user with ID: {UserId}", userId);
+
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found for profile update with ID: {UserId}", userId);
+            throw new InvalidOperationException($"User with ID {userId} not found");
+        }
+
+        user.Name = name;
+        var updatedUser = await _userRepository.UpdateAsync(user);
+
+        _logger.LogInformation("User profile updated successfully with ID: {UserId}", userId);
+        return updatedUser;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> UserExistsAsync(string email, CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Checking if user exists with email: {Email}", email);
-        
+
         return await _userRepository.ExistsAsync(email);
     }
 }

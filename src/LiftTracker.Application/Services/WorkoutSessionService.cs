@@ -171,7 +171,7 @@ public class WorkoutSessionService : IWorkoutSessionService
             return false;
         }
 
-        await _sessionRepository.DeleteAsync(session, cancellationToken);
+        await _sessionRepository.DeleteAsync(session.Id, session.UserId, cancellationToken);
 
         _logger.LogInformation("Deleted workout session: {SessionId}", sessionId);
         return true;

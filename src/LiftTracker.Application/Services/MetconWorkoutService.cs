@@ -210,7 +210,15 @@ public class MetconWorkoutService : IMetconWorkoutService
             return false;
         }
 
-        await _metconWorkoutRepository.DeleteAsync(workout, cancellationToken);
+        // Get the workout session to find the userId
+        var session = await _sessionRepository.GetByIdAsync(workout.WorkoutSessionId, cancellationToken);
+        if (session == null)
+        {
+            _logger.LogWarning("Cannot delete - associated session not found: {SessionId}", workout.WorkoutSessionId);
+            return false;
+        }
+
+        await _metconWorkoutRepository.DeleteAsync(workout.Id, session.UserId, cancellationToken);
 
         _logger.LogInformation("Deleted metcon workout: {WorkoutId}", workoutId);
         return true;

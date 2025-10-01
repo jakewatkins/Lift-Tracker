@@ -286,7 +286,15 @@ public class StrengthLiftService : IStrengthLiftService
             return false;
         }
 
-        await _strengthLiftRepository.DeleteAsync(lift, cancellationToken);
+        // Get the workout session to find the userId
+        var session = await _sessionRepository.GetByIdAsync(lift.WorkoutSessionId, cancellationToken);
+        if (session == null)
+        {
+            _logger.LogWarning("Cannot delete - associated session not found: {SessionId}", lift.WorkoutSessionId);
+            return false;
+        }
+
+        await _strengthLiftRepository.DeleteAsync(lift.Id, session.UserId, cancellationToken);
 
         _logger.LogInformation("Deleted strength lift: {LiftId}", liftId);
         return true;
