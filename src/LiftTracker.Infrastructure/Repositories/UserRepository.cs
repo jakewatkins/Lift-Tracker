@@ -21,33 +21,36 @@ public class UserRepository : IUserRepository
     /// Gets a user by their unique identifier
     /// </summary>
     /// <param name="id">User ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User entity or null if not found</returns>
-    public async Task<User?> GetByIdAsync(Guid id)
+    public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Users
-            .FirstOrDefaultAsync(u => u.Id == id);
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 
     /// <summary>
     /// Gets a user by their email address
     /// </summary>
     /// <param name="email">Email address</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User entity or null if not found</returns>
-    public async Task<User?> GetByEmailAsync(string email)
+    public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(email))
             return null;
 
         return await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == email);
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
     /// <summary>
     /// Creates a new user
     /// </summary>
     /// <param name="user">User to create</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created user with generated ID</returns>
-    public async Task<User> CreateAsync(User user)
+    public async Task<User> CreateAsync(User user, CancellationToken cancellationToken = default)
     {
         if (user == null)
             throw new ArgumentNullException(nameof(user));
@@ -61,7 +64,7 @@ public class UserRepository : IUserRepository
             user.CreatedDate = DateTime.UtcNow;
 
         _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return user;
     }
@@ -70,13 +73,14 @@ public class UserRepository : IUserRepository
     /// Updates an existing user
     /// </summary>
     /// <param name="user">User to update</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated user</returns>
-    public async Task<User> UpdateAsync(User user)
+    public async Task<User> UpdateAsync(User user, CancellationToken cancellationToken = default)
     {
         if (user == null)
             throw new ArgumentNullException(nameof(user));
 
-        var existingUser = await _context.Users.FindAsync(user.Id);
+        var existingUser = await _context.Users.FindAsync(new object[] { user.Id }, cancellationToken);
         if (existingUser == null)
             throw new InvalidOperationException($"User with ID {user.Id} not found");
 
@@ -86,7 +90,7 @@ public class UserRepository : IUserRepository
         existingUser.LastLoginDate = user.LastLoginDate;
 
         _context.Users.Update(existingUser);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return existingUser;
     }
@@ -95,15 +99,16 @@ public class UserRepository : IUserRepository
     /// Deletes a user by ID
     /// </summary>
     /// <param name="id">User ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if deleted, false if not found</returns>
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var user = await _context.Users.FindAsync(id);
+        var user = await _context.Users.FindAsync(new object[] { id }, cancellationToken);
         if (user == null)
             return false;
 
         _context.Users.Remove(user);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return true;
     }
@@ -112,13 +117,14 @@ public class UserRepository : IUserRepository
     /// Checks if a user exists by email
     /// </summary>
     /// <param name="email">Email address</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if user exists</returns>
-    public async Task<bool> ExistsAsync(string email)
+    public async Task<bool> ExistsAsync(string email, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(email))
             return false;
 
         return await _context.Users
-            .AnyAsync(u => u.Email == email);
+            .AnyAsync(u => u.Email == email, cancellationToken);
     }
 }

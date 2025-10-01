@@ -21,32 +21,48 @@ public class ExerciseTypeRepository : IExerciseTypeRepository
     /// Gets an exercise type by ID
     /// </summary>
     /// <param name="id">Exercise type ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Exercise type or null if not found</returns>
-    public async Task<ExerciseType?> GetByIdAsync(int id)
+    public async Task<ExerciseType?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.ExerciseTypes
-            .FirstOrDefaultAsync(et => et.Id == id);
+            .FirstOrDefaultAsync(et => et.Id == id, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets all exercise types
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of all exercise types</returns>
+    public async Task<IEnumerable<ExerciseType>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.ExerciseTypes
+            .OrderBy(et => et.Category)
+            .ThenBy(et => et.Name)
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Gets all active exercise types
     /// </summary>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of active exercise types</returns>
-    public async Task<IEnumerable<ExerciseType>> GetActiveAsync()
+    public async Task<IEnumerable<ExerciseType>> GetActiveAsync(CancellationToken cancellationToken = default)
     {
         return await _context.ExerciseTypes
             .Where(et => et.IsActive)
             .OrderBy(et => et.Category)
             .ThenBy(et => et.Name)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Gets exercise types by category
     /// </summary>
     /// <param name="category">Exercise category</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of exercise types in the category</returns>
-    public async Task<IEnumerable<ExerciseType>> GetByCategoryAsync(string category)
+    public async Task<IEnumerable<ExerciseType>> GetByCategoryAsync(string category, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(category))
             throw new ArgumentException("Category cannot be null or empty", nameof(category));
@@ -54,36 +70,25 @@ public class ExerciseTypeRepository : IExerciseTypeRepository
         return await _context.ExerciseTypes
             .Where(et => et.Category == category && et.IsActive)
             .OrderBy(et => et.Name)
-            .ToListAsync();
-    }
-
-    /// <summary>
-    /// Gets all exercise types (including inactive)
-    /// </summary>
-    /// <returns>List of all exercise types</returns>
-    public async Task<IEnumerable<ExerciseType>> GetAllAsync()
-    {
-        return await _context.ExerciseTypes
-            .OrderBy(et => et.Category)
-            .ThenBy(et => et.Name)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Creates a new exercise type
     /// </summary>
     /// <param name="exerciseType">Exercise type to create</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created exercise type with generated ID</returns>
-    public async Task<ExerciseType> CreateAsync(ExerciseType exerciseType)
+    public async Task<ExerciseType> CreateAsync(ExerciseType exerciseType, CancellationToken cancellationToken = default)
     {
         if (exerciseType == null)
             throw new ArgumentNullException(nameof(exerciseType));
 
         // Validate business rules
-        await ValidateExerciseTypeAsync(exerciseType);
+        await ValidateExerciseTypeAsync(exerciseType, cancellationToken);
 
         _context.ExerciseTypes.Add(exerciseType);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return exerciseType;
     }
@@ -92,14 +97,15 @@ public class ExerciseTypeRepository : IExerciseTypeRepository
     /// Updates an existing exercise type
     /// </summary>
     /// <param name="exerciseType">Exercise type to update</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated exercise type</returns>
-    public async Task<ExerciseType> UpdateAsync(ExerciseType exerciseType)
+    public async Task<ExerciseType> UpdateAsync(ExerciseType exerciseType, CancellationToken cancellationToken = default)
     {
         if (exerciseType == null)
             throw new ArgumentNullException(nameof(exerciseType));
 
         var existingExerciseType = await _context.ExerciseTypes
-            .FirstOrDefaultAsync(et => et.Id == exerciseType.Id);
+            .FirstOrDefaultAsync(et => et.Id == exerciseType.Id, cancellationToken);
 
         if (existingExerciseType == null)
             throw new InvalidOperationException($"Exercise type {exerciseType.Id} not found");
@@ -107,7 +113,7 @@ public class ExerciseTypeRepository : IExerciseTypeRepository
         // Validate business rules (only check name uniqueness if name changed)
         if (!string.Equals(existingExerciseType.Name, exerciseType.Name, StringComparison.OrdinalIgnoreCase))
         {
-            await ValidateExerciseTypeAsync(exerciseType);
+            await ValidateExerciseTypeAsync(exerciseType, cancellationToken);
         }
 
         // Update properties
@@ -115,7 +121,7 @@ public class ExerciseTypeRepository : IExerciseTypeRepository
         existingExerciseType.Category = exerciseType.Category;
         existingExerciseType.IsActive = exerciseType.IsActive;
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return existingExerciseType;
     }
@@ -124,30 +130,31 @@ public class ExerciseTypeRepository : IExerciseTypeRepository
     /// Deactivates an exercise type (soft delete)
     /// </summary>
     /// <param name="id">Exercise type ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if deactivated, false if not found</returns>
-    public async Task<bool> DeactivateAsync(int id)
+    public async Task<bool> DeactivateAsync(int id, CancellationToken cancellationToken = default)
     {
         var exerciseType = await _context.ExerciseTypes
-            .FirstOrDefaultAsync(et => et.Id == id);
+            .FirstOrDefaultAsync(et => et.Id == id, cancellationToken);
 
         if (exerciseType == null)
             return false;
 
         // Check if exercise type is used in any strength lifts
         var isUsed = await _context.StrengthLifts
-            .AnyAsync(sl => sl.ExerciseTypeId == id);
+            .AnyAsync(sl => sl.ExerciseTypeId == id, cancellationToken);
 
         if (isUsed)
         {
             // Soft delete - deactivate instead of hard delete
             exerciseType.IsActive = false;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
         else
         {
             // Hard delete if not used
             _context.ExerciseTypes.Remove(exerciseType);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         return true;
@@ -157,22 +164,24 @@ public class ExerciseTypeRepository : IExerciseTypeRepository
     /// Checks if an exercise type exists by name
     /// </summary>
     /// <param name="name">Exercise type name</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if exercise type exists</returns>
-    public async Task<bool> ExistsByNameAsync(string name)
+    public async Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(name))
             return false;
 
         return await _context.ExerciseTypes
-            .AnyAsync(et => et.Name == name);
+            .AnyAsync(et => et.Name == name, cancellationToken);
     }
 
     /// <summary>
     /// Validates exercise type business rules
     /// </summary>
     /// <param name="exerciseType">Exercise type to validate</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     /// <exception cref="ArgumentException">Thrown when validation fails</exception>
-    private async Task ValidateExerciseTypeAsync(ExerciseType exerciseType)
+    private async Task ValidateExerciseTypeAsync(ExerciseType exerciseType, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(exerciseType.Name))
             throw new ArgumentException("Exercise type name is required", nameof(exerciseType.Name));
@@ -188,7 +197,7 @@ public class ExerciseTypeRepository : IExerciseTypeRepository
 
         // Check for duplicate names
         var existingWithSameName = await _context.ExerciseTypes
-            .FirstOrDefaultAsync(et => et.Name == exerciseType.Name && et.Id != exerciseType.Id);
+            .FirstOrDefaultAsync(et => et.Name == exerciseType.Name && et.Id != exerciseType.Id, cancellationToken);
 
         if (existingWithSameName != null)
             throw new ArgumentException($"An exercise type with the name '{exerciseType.Name}' already exists", nameof(exerciseType.Name));

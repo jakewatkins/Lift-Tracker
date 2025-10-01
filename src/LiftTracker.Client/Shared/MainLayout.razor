@@ -1,6 +1,8 @@
 @using LiftTracker.Client.Services
 @using LiftTracker.Client.Components
-@inherits LayoutView
+@using System.Security.Claims
+@inherits LayoutComponentBase
+@implements IDisposable
 @inject AuthService AuthService
 
 <div class="h-screen bg-gray-50 overflow-hidden">
@@ -136,7 +138,7 @@
         // StateService.NotificationAdded += OnNotificationAdded;
     }
 
-    private void OnAuthenticationChanged(bool isAuthenticated)
+    private void OnAuthenticationChanged(ClaimsPrincipal? user)
     {
         StateHasChanged();
     }

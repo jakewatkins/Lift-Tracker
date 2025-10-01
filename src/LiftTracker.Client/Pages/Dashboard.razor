@@ -13,7 +13,7 @@
         <div class="flex items-center justify-center min-h-screen">
             <div class="text-center">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4">Please log in to continue</h2>
-                <button @onclick="() => Navigation.NavigateTo('/login')"
+                <button @onclick='() => Navigation.NavigateTo("/login")'
                         class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
                     Go to Login
                 </button>
@@ -111,7 +111,7 @@
                         <div class="text-sm font-medium">Start New Workout</div>
                     </button>
 
-                    <button @onclick="() => StateService.ActiveView = 'progress'"
+                    <button @onclick='() => StateService.ActiveView = "progress"'
                             class="bg-green-600 text-white p-6 rounded-lg hover:bg-green-700 transition-colors">
                         <svg class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -119,7 +119,7 @@
                         <div class="text-sm font-medium">View Progress</div>
                     </button>
 
-                    <button @onclick="() => StateService.ActiveView = 'history'"
+                    <button @onclick='() => StateService.ActiveView = "history"'
                             class="bg-purple-600 text-white p-6 rounded-lg hover:bg-purple-700 transition-colors">
                         <svg class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -133,7 +133,7 @@
             <div class="mb-8">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-gray-900">Recent Workouts</h2>
-                    <button @onclick="() => StateService.ActiveView = 'history'"
+                    <button @onclick='() => StateService.ActiveView = "history"'
                             class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
                         View all
                     </button>
@@ -233,7 +233,7 @@
         var createDto = new CreateWorkoutSessionDto
         {
             Name = $"Workout {DateTime.Now:MMM dd, yyyy}",
-            Date = DateTime.Now,
+            Date = DateOnly.FromDateTime(DateTime.Now),
             Notes = string.Empty
         };
 
@@ -250,13 +250,15 @@
     private int GetWorkoutsThisWeek()
     {
         var startOfWeek = DateTime.Now.Date.AddDays(-(int)DateTime.Now.DayOfWeek);
-        return StateService.WorkoutSessions.Count(w => w.Date >= startOfWeek);
+        var startDateOnly = DateOnly.FromDateTime(startOfWeek);
+        return StateService.WorkoutSessions.Count(w => w.Date >= startDateOnly);
     }
 
     private int GetWorkoutsThisMonth()
     {
         var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-        return StateService.WorkoutSessions.Count(w => w.Date >= startOfMonth);
+        var startDateOnly = DateOnly.FromDateTime(startOfMonth);
+        return StateService.WorkoutSessions.Count(w => w.Date >= startDateOnly);
     }
 
     private string GetProgressScore()

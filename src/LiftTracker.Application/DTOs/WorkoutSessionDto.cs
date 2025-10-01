@@ -14,6 +14,11 @@ public class WorkoutSessionDto
     [Required]
     public DateOnly Date { get; set; }
 
+    [StringLength(500, ErrorMessage = "Name cannot exceed 500 characters")]
+    public string? Name { get; set; }
+
+    public TimeSpan? Duration { get; set; }
+
     [StringLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters")]
     public string? Notes { get; set; }
 
@@ -32,6 +37,9 @@ public class CreateWorkoutSessionDto
 
     [Required]
     public DateOnly Date { get; set; }
+
+    [StringLength(500, ErrorMessage = "Name cannot exceed 500 characters")]
+    public string? Name { get; set; }
 
     [StringLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters")]
     public string? Notes { get; set; }
