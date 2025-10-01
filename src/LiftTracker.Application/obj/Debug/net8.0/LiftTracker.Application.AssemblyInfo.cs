@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LiftTracker.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d426c946ffeaa92b75db0603720cc45cb5c3dcaf")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eaa24641ca0ebe73d8947e07e7b5415595b93365")]
 [assembly: System.Reflection.AssemblyProductAttribute("LiftTracker.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LiftTracker.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
