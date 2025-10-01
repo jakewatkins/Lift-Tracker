@@ -83,7 +83,7 @@ Web application structure with clean architecture:
 - [x] T031 [P] Domain interfaces in src/LiftTracker.Domain/Interfaces/
 - [x] T032 [P] Value objects (Weight, Duration) in src/LiftTracker.Domain/ValueObjects/
 
-## Phase 3.4: Infrastructure Layer 🔄 IN PROGRESS
+## Phase 3.4: Infrastructure Layer ✅ COMPLETE
 - [x] T033 EF Core DbContext configuration in src/LiftTracker.Infrastructure/Data/LiftTrackerDbContext.cs
 - [x] T034 [P] User repository in src/LiftTracker.Infrastructure/Repositories/UserRepository.cs
 - [x] T035 [P] WorkoutSession repository in src/LiftTracker.Infrastructure/Repositories/WorkoutSessionRepository.cs
@@ -94,24 +94,28 @@ Web application structure with clean architecture:
 - [x] T040 [P] Google OAuth authentication configuration in src/LiftTracker.Infrastructure/Authentication/
 - [x] T041 [P] SeriLog logging configuration in src/LiftTracker.Infrastructure/Logging/
 
-## Phase 3.5: Application Layer
-- [ ] T042 [P] User service in src/LiftTracker.Application/Services/UserService.cs
-- [ ] T043 [P] WorkoutSession service in src/LiftTracker.Application/Services/WorkoutSessionService.cs
-- [ ] T044 [P] StrengthLift service in src/LiftTracker.Application/Services/StrengthLiftService.cs
-- [ ] T045 [P] MetconWorkout service in src/LiftTracker.Application/Services/MetconWorkoutService.cs
-- [ ] T046 [P] Progress tracking service in src/LiftTracker.Application/Services/ProgressService.cs
-- [ ] T047 [P] DTOs for all entities in src/LiftTracker.Application/DTOs/
-- [ ] T048 [P] AutoMapper configuration in src/LiftTracker.Application/Mappers/
-- [ ] T049 [P] Application service interfaces in src/LiftTracker.Application/Interfaces/
+## Phase 3.5: Application Layer ✅ COMPLETE
+- [x] T042 [P] User service in src/LiftTracker.Application/Services/UserService.cs
+- [x] T043 [P] WorkoutSession service in src/LiftTracker.Application/Services/WorkoutSessionService.cs
+- [x] T044 [P] StrengthLift service in src/LiftTracker.Application/Services/StrengthLiftService.cs
+- [x] T045 [P] MetconWorkout service in src/LiftTracker.Application/Services/MetconWorkoutService.cs
+- [x] T046 [P] Progress tracking service in src/LiftTracker.Application/Services/ProgressService.cs
+- [x] T047 [P] DTOs for all entities in src/LiftTracker.Application/DTOs/
+- [x] T048 [P] AutoMapper configuration in src/LiftTracker.Application/Mappings/
+- [x] T049 [P] Application service interfaces in src/LiftTracker.Application/Interfaces/
 
 ## Phase 3.6: API Layer
-- [ ] T050 Authentication controller (login, logout) in src/LiftTracker.API/Controllers/AuthController.cs
-- [ ] T051 Users controller (profile management) in src/LiftTracker.API/Controllers/UsersController.cs
-- [ ] T052 WorkoutSessions controller (CRUD) in src/LiftTracker.API/Controllers/WorkoutSessionsController.cs
-- [ ] T053 StrengthLifts controller (CRUD) in src/LiftTracker.API/Controllers/StrengthLiftsController.cs
-- [ ] T054 MetconWorkouts controller (CRUD) in src/LiftTracker.API/Controllers/MetconWorkoutsController.cs
-- [ ] T055 Progress controller (charts, analytics) in src/LiftTracker.API/Controllers/ProgressController.cs
-- [ ] T056 ExerciseTypes controller (reference data) in src/LiftTracker.API/Controllers/ExerciseTypesController.cs
+**Status:** In Progress
+**Dependencies:** Application Layer complete
+
+### Controllers
+**T050** ✅ AuthController - OAuth integration, JWT token management
+**T051** ✅ UsersController - User profile CRUD operations
+**T052** ✅ WorkoutSessionsController - Workout session CRUD operations
+**T053** ✅ StrengthLiftsController - Strength lift CRUD operations
+**T054** ✅ MetconWorkoutsController - Metcon workout CRUD operations
+**T055** ✅ ProgressController - Analytics and progress tracking endpoints
+**T056** ✅ ExerciseTypesController - Exercise type reference data
 - [ ] T057 [P] Input validation middleware in src/LiftTracker.API/Middleware/ValidationMiddleware.cs
 - [ ] T058 [P] Error handling middleware in src/LiftTracker.API/Middleware/ErrorHandlingMiddleware.cs
 - [ ] T059 [P] Authentication middleware configuration in src/LiftTracker.API/Middleware/AuthenticationMiddleware.cs
