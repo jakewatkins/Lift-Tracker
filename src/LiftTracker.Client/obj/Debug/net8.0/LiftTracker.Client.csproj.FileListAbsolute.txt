@@ -1024,9 +1024,6 @@
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/tr75nau05j-tptq2av103.gz
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/7ibrzinkrs-lfu7j35m59.gz
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/ce6t40jx24-oyz0vx2fzb.gz
-/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/npzfpw9qo6-q5n7jrbi8u.gz
-/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/b23dx23tza-10go6f5l3r.gz
-/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/je2bz4cwvs-6ri8huby4v.gz
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/staticwebassets.build.json
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/staticwebassets.build.json.cache
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/staticwebassets.development.json
@@ -1036,3 +1033,6 @@
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/refint/LiftTracker.Client.dll
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/LiftTracker.Client.pdb
 /Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/ref/LiftTracker.Client.dll
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/npzfpw9qo6-n2ljj8a66t.gz
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/b23dx23tza-1nb40m8c2e.gz
+/Users/jakewatkins/source/trashcode/speckit-test1/lift-tracker/src/LiftTracker.Client/obj/Debug/net8.0/compressed/je2bz4cwvs-gg2fgjjlym.gz
