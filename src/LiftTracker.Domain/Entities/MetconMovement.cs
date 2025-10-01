@@ -85,7 +85,7 @@ public class MetconMovement
     public bool IsValidWeight()
     {
         if (Weight == null) return true;
-        
+
         var fractionalPart = Weight.Value - Math.Floor(Weight.Value);
         var validFractions = new[] { 0.0m, 0.25m, 0.5m, 0.75m };
         return validFractions.Contains(fractionalPart) && Weight >= 0;
@@ -98,7 +98,7 @@ public class MetconMovement
     public bool HasValidMeasurement()
     {
         if (MovementType == null) return false;
-        
+
         if (MovementType.IsRepBased)
         {
             return Reps.HasValue && !Distance.HasValue;
@@ -107,7 +107,7 @@ public class MetconMovement
         {
             return Distance.HasValue && !Reps.HasValue;
         }
-        
+
         return false;
     }
 }

@@ -162,7 +162,7 @@ public record Duration
             var hours = (int)(Value / 60);
             var minutes = (int)(Value % 60);
             var seconds = (int)((Value % 1) * 60);
-            
+
             if (seconds > 0)
                 return $"{hours} hr {minutes} min {seconds} sec";
             else if (minutes > 0)
@@ -174,7 +174,7 @@ public record Duration
         {
             var minutes = (int)Value;
             var seconds = (int)((Value % 1) * 60);
-            
+
             if (minutes > 0)
                 return $"{minutes}:{seconds:00}";
             else

@@ -73,7 +73,7 @@ public class MetconWorkout
     public bool IsValidTotalTime()
     {
         if (TotalTime == null) return true;
-        
+
         var fractionalPart = TotalTime.Value - Math.Floor(TotalTime.Value);
         var validFractions = new[] { 0.0m, 0.25m, 0.5m, 0.75m };
         return validFractions.Contains(fractionalPart) && TotalTime >= 0;

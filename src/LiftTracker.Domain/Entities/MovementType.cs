@@ -61,7 +61,7 @@ public class MovementType
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Category = category ?? throw new ArgumentNullException(nameof(category));
         MeasurementType = measurementType ?? throw new ArgumentNullException(nameof(measurementType));
-        
+
         if (measurementType != "Reps" && measurementType != "Distance")
         {
             throw new ArgumentException("MeasurementType must be 'Reps' or 'Distance'", nameof(measurementType));

@@ -71,28 +71,28 @@ Web application structure with clean architecture:
 - [x] T021 [P] Integration test for progress charts (Stories 8-9) in tests/LiftTracker.API.Tests/Integration/ProgressTrackingIntegrationTest.cs
 - [x] T022 [P] Integration test for data isolation (Story 10) in tests/LiftTracker.API.Tests/Integration/DataIsolationIntegrationTest.cs
 
-## Phase 3.3: Domain Layer (ONLY after tests are failing)
-- [ ] T023 [P] User entity in src/LiftTracker.Domain/Entities/User.cs
-- [ ] T024 [P] WorkoutSession entity in src/LiftTracker.Domain/Entities/WorkoutSession.cs
-- [ ] T025 [P] ExerciseType entity in src/LiftTracker.Domain/Entities/ExerciseType.cs
-- [ ] T026 [P] StrengthLift entity in src/LiftTracker.Domain/Entities/StrengthLift.cs
-- [ ] T027 [P] MetconType entity in src/LiftTracker.Domain/Entities/MetconType.cs
-- [ ] T028 [P] MetconWorkout entity in src/LiftTracker.Domain/Entities/MetconWorkout.cs
-- [ ] T029 [P] MovementType entity in src/LiftTracker.Domain/Entities/MovementType.cs
-- [ ] T030 [P] MetconMovement entity in src/LiftTracker.Domain/Entities/MetconMovement.cs
-- [ ] T031 [P] Domain interfaces in src/LiftTracker.Domain/Interfaces/
-- [ ] T032 [P] Value objects (Weight, Duration) in src/LiftTracker.Domain/ValueObjects/
+## Phase 3.3: Domain Layer ✅ COMPLETE
+- [x] T023 [P] User entity in src/LiftTracker.Domain/Entities/User.cs
+- [x] T024 [P] WorkoutSession entity in src/LiftTracker.Domain/Entities/WorkoutSession.cs
+- [x] T025 [P] ExerciseType entity in src/LiftTracker.Domain/Entities/ExerciseType.cs
+- [x] T026 [P] StrengthLift entity in src/LiftTracker.Domain/Entities/StrengthLift.cs
+- [x] T027 [P] MetconType entity in src/LiftTracker.Domain/Entities/MetconType.cs
+- [x] T028 [P] MetconWorkout entity in src/LiftTracker.Domain/Entities/MetconWorkout.cs
+- [x] T029 [P] MovementType entity in src/LiftTracker.Domain/Entities/MovementType.cs
+- [x] T030 [P] MetconMovement entity in src/LiftTracker.Domain/Entities/MetconMovement.cs
+- [x] T031 [P] Domain interfaces in src/LiftTracker.Domain/Interfaces/
+- [x] T032 [P] Value objects (Weight, Duration) in src/LiftTracker.Domain/ValueObjects/
 
-## Phase 3.4: Infrastructure Layer
-- [ ] T033 EF Core DbContext configuration in src/LiftTracker.Infrastructure/Data/LiftTrackerDbContext.cs
-- [ ] T034 [P] User repository in src/LiftTracker.Infrastructure/Repositories/UserRepository.cs
-- [ ] T035 [P] WorkoutSession repository in src/LiftTracker.Infrastructure/Repositories/WorkoutSessionRepository.cs
-- [ ] T036 [P] StrengthLift repository in src/LiftTracker.Infrastructure/Repositories/StrengthLiftRepository.cs
-- [ ] T037 [P] MetconWorkout repository in src/LiftTracker.Infrastructure/Repositories/MetconWorkoutRepository.cs
-- [ ] T038 [P] ExerciseType repository in src/LiftTracker.Infrastructure/Repositories/ExerciseTypeRepository.cs
-- [ ] T039 Database migrations and seed data configuration
-- [ ] T040 [P] Google OAuth authentication configuration in src/LiftTracker.Infrastructure/Authentication/
-- [ ] T041 [P] SeriLog logging configuration in src/LiftTracker.Infrastructure/Logging/
+## Phase 3.4: Infrastructure Layer 🔄 IN PROGRESS
+- [x] T033 EF Core DbContext configuration in src/LiftTracker.Infrastructure/Data/LiftTrackerDbContext.cs
+- [x] T034 [P] User repository in src/LiftTracker.Infrastructure/Repositories/UserRepository.cs
+- [x] T035 [P] WorkoutSession repository in src/LiftTracker.Infrastructure/Repositories/WorkoutSessionRepository.cs
+- [x] T036 [P] StrengthLift repository in src/LiftTracker.Infrastructure/Repositories/StrengthLiftRepository.cs
+- [x] T037 [P] MetconWorkout repository in src/LiftTracker.Infrastructure/Repositories/MetconWorkoutRepository.cs
+- [x] T038 [P] ExerciseType repository in src/LiftTracker.Infrastructure/Repositories/ExerciseTypeRepository.cs
+- [x] T039 Database migrations and seed data configuration
+- [x] T040 [P] Google OAuth authentication configuration in src/LiftTracker.Infrastructure/Authentication/
+- [x] T041 [P] SeriLog logging configuration in src/LiftTracker.Infrastructure/Logging/
 
 ## Phase 3.5: Application Layer
 - [ ] T042 [P] User service in src/LiftTracker.Application/Services/UserService.cs
