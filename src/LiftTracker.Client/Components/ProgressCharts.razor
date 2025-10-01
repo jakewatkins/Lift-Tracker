@@ -1,0 +1,402 @@
+@using LiftTracker.Client.Services
+@using LiftTracker.Application.DTOs
+@inject StateService StateService
+
+<div class="bg-white rounded-lg shadow">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-900">Progress Charts</h2>
+
+            <!-- Chart Type Selector -->
+            <div class="flex space-x-2">
+                <select @bind="selectedChartType"
+                        @bind:after="LoadChartData"
+                        class="px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="strength">Strength Progress</option>
+                    <option value="workout-frequency">Workout Frequency</option>
+                    <option value="volume">Training Volume</option>
+                </select>
+
+                <select @bind="selectedTimeframe"
+                        @bind:after="LoadChartData"
+                        class="px-3 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="30">Last 30 Days</option>
+                    <option value="90">Last 3 Months</option>
+                    <option value="180">Last 6 Months</option>
+                    <option value="365">Last Year</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Content -->
+    <div class="p-6">
+        @if (isLoading)
+        {
+            <div class="flex justify-center items-center h-64">
+                <div class="flex items-center space-x-2">
+                    <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-gray-600">Loading chart data...</span>
+                </div>
+            </div>
+        }
+        else if (chartData.Any())
+        {
+            @if (selectedChartType == "strength")
+            {
+                <div class="space-y-6">
+                    @if (exerciseOptions.Any())
+                    {
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Select Exercise:
+                            </label>
+                            <select @bind="selectedExercise"
+                                    @bind:after="LoadChartData"
+                                    class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                @foreach (var exercise in exerciseOptions)
+                                {
+                                    <option value="@exercise">@exercise</option>
+                                }
+                            </select>
+                        </div>
+                    }
+
+                    <!-- Strength Progress Chart (CSS-based visualization) -->
+                    <div class="relative h-64">
+                        <div class="absolute inset-0 flex items-end justify-between px-4 pb-8">
+                            @foreach (var point in chartData.Take(10)) // Show last 10 data points
+                            {
+                                var height = GetBarHeight(point.Value, chartData.Max(d => d.Value));
+                                <div class="flex flex-col items-center space-y-1" style="width: @(80/Math.Min(chartData.Count, 10))%">
+                                    <div class="text-xs text-gray-600 font-medium">@point.Value.ToString("F1")</div>
+                                    <div class="bg-indigo-500 rounded-t w-8 transition-all duration-500"
+                                         style="height: @(height)px"></div>
+                                    <div class="text-xs text-gray-500 text-center w-full">
+                                        @point.Date.ToString("MM/dd")
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Y-axis labels -->
+                        <div class="absolute left-0 top-0 h-full flex flex-col justify-between py-4 text-xs text-gray-500">
+                            <span>@chartData.Max(d => d.Value).ToString("F0")</span>
+                            <span>@(chartData.Max(d => d.Value) * 0.5).ToString("F0")</span>
+                            <span>0</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (selectedChartType == "workout-frequency")
+            {
+                <!-- Workout Frequency Chart -->
+                <div class="space-y-4">
+                    <div class="relative h-64">
+                        <div class="absolute inset-0 flex items-end justify-between px-4 pb-8">
+                            @foreach (var point in chartData.TakeLast(7)) // Show last 7 days
+                            {
+                                var height = GetBarHeight(point.Value, chartData.Max(d => d.Value));
+                                <div class="flex flex-col items-center space-y-1" style="width: 12%">
+                                    <div class="text-xs text-gray-600 font-medium">@point.Value.ToString("F0")</div>
+                                    <div class="bg-green-500 rounded-t w-8 transition-all duration-500"
+                                         style="height: @(height)px"></div>
+                                    <div class="text-xs text-gray-500 text-center">
+                                        @point.Date.ToString("ddd")
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Y-axis labels -->
+                        <div class="absolute left-0 top-0 h-full flex flex-col justify-between py-4 text-xs text-gray-500">
+                            <span>@chartData.Max(d => d.Value).ToString("F0")</span>
+                            <span>@(chartData.Max(d => d.Value) * 0.5).ToString("F0")</span>
+                            <span>0</span>
+                        </div>
+                    </div>
+
+                    <!-- Summary Stats -->
+                    <div class="grid grid-cols-3 gap-4 mt-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900">@GetTotalWorkouts()</div>
+                            <div class="text-sm text-gray-500">Total Workouts</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">@GetAveragePerWeek().ToString("F1")</div>
+                            <div class="text-sm text-gray-500">Avg/Week</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-indigo-600">@GetCurrentStreak()</div>
+                            <div class="text-sm text-gray-500">Day Streak</div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (selectedChartType == "volume")
+            {
+                <!-- Training Volume Chart -->
+                <div class="space-y-4">
+                    <div class="relative h-64">
+                        <div class="absolute inset-0 flex items-end justify-between px-4 pb-8">
+                            @foreach (var point in chartData.TakeLast(8)) // Show last 8 weeks
+                            {
+                                var height = GetBarHeight(point.Value, chartData.Max(d => d.Value));
+                                <div class="flex flex-col items-center space-y-1" style="width: 11%">
+                                    <div class="text-xs text-gray-600 font-medium">@point.Value.ToString("F0")</div>
+                                    <div class="bg-purple-500 rounded-t w-8 transition-all duration-500"
+                                         style="height: @(height)px"></div>
+                                    <div class="text-xs text-gray-500 text-center">
+                                        Wk @point.Date.ToString("MM/dd")
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Y-axis labels -->
+                        <div class="absolute left-0 top-0 h-full flex flex-col justify-between py-4 text-xs text-gray-500">
+                            <span>@chartData.Max(d => d.Value).ToString("F0")</span>
+                            <span>@(chartData.Max(d => d.Value) * 0.5).ToString("F0")</span>
+                            <span>0</span>
+                        </div>
+                    </div>
+
+                    <!-- Volume Breakdown -->
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600">@GetTotalVolume().ToString("N0")</div>
+                            <div class="text-sm text-gray-500">Total Volume (lbs)</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-gray-900">@GetAverageVolume().ToString("F0")</div>
+                            <div class="text-sm text-gray-500">Avg/Workout (lbs)</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <!-- No Data State -->
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No data available</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    @GetNoDataMessage()
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private string selectedChartType = "strength";
+    private string selectedTimeframe = "30";
+    private string selectedExercise = string.Empty;
+    private List<ChartDataPoint> chartData = new();
+    private List<string> exerciseOptions = new();
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadExerciseOptions();
+        await LoadChartData();
+    }
+
+    private async Task LoadExerciseOptions()
+    {
+        // Load exercise types for strength chart
+        await StateService.LoadExerciseTypesAsync();
+        exerciseOptions = StateService.ExerciseTypes
+            .Where(et => et.Category == "Strength")
+            .Select(et => et.Name)
+            .OrderBy(name => name)
+            .ToList();
+
+        if (exerciseOptions.Any() && string.IsNullOrEmpty(selectedExercise))
+        {
+            selectedExercise = exerciseOptions.First();
+        }
+    }
+
+    private async Task LoadChartData()
+    {
+        if (isLoading) return;
+
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            chartData.Clear();
+            var endDate = DateTime.Now;
+            var startDate = endDate.AddDays(-int.Parse(selectedTimeframe));
+
+            if (selectedChartType == "strength")
+            {
+                await LoadStrengthProgressData(startDate, endDate);
+            }
+            else if (selectedChartType == "workout-frequency")
+            {
+                await LoadWorkoutFrequencyData(startDate, endDate);
+            }
+            else if (selectedChartType == "volume")
+            {
+                await LoadTrainingVolumeData(startDate, endDate);
+            }
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadStrengthProgressData(DateTime startDate, DateTime endDate)
+    {
+        if (string.IsNullOrEmpty(selectedExercise)) return;
+
+        // Load strength lifts for the selected exercise
+        await StateService.LoadStrengthLiftsAsync();
+
+        var strengthLifts = StateService.StrengthLifts
+            .Where(sl => sl.ExerciseTypeName == selectedExercise &&
+                        sl.Date >= startDate &&
+                        sl.Date <= endDate)
+            .OrderBy(sl => sl.Date)
+            .ToList();
+
+        // Group by date and get max weight for each day
+        var progressData = strengthLifts
+            .GroupBy(sl => sl.Date.Date)
+            .Select(g => new ChartDataPoint
+            {
+                Date = g.Key,
+                Value = g.Max(sl => sl.Weight)
+            })
+            .OrderBy(cdp => cdp.Date)
+            .ToList();
+
+        chartData.AddRange(progressData);
+    }
+
+    private async Task LoadWorkoutFrequencyData(DateTime startDate, DateTime endDate)
+    {
+        // Load workout sessions
+        await StateService.LoadWorkoutSessionsAsync();
+
+        var workoutSessions = StateService.WorkoutSessions
+            .Where(ws => ws.Date >= startDate && ws.Date <= endDate)
+            .ToList();
+
+        // Group by week and count workouts
+        var frequencyData = new List<ChartDataPoint>();
+        var currentDate = startDate;
+
+        while (currentDate <= endDate)
+        {
+            var weekEnd = currentDate.AddDays(6);
+            var weeklyWorkouts = workoutSessions
+                .Count(ws => ws.Date >= currentDate && ws.Date <= weekEnd);
+
+            frequencyData.Add(new ChartDataPoint
+            {
+                Date = currentDate,
+                Value = weeklyWorkouts
+            });
+
+            currentDate = currentDate.AddDays(7);
+        }
+
+        chartData.AddRange(frequencyData);
+    }
+
+    private async Task LoadTrainingVolumeData(DateTime startDate, DateTime endDate)
+    {
+        // Load strength lifts
+        await StateService.LoadStrengthLiftsAsync();
+
+        var strengthLifts = StateService.StrengthLifts
+            .Where(sl => sl.Date >= startDate && sl.Date <= endDate)
+            .ToList();
+
+        // Group by week and calculate total volume
+        var volumeData = new List<ChartDataPoint>();
+        var currentDate = startDate;
+
+        while (currentDate <= endDate)
+        {
+            var weekEnd = currentDate.AddDays(6);
+            var weeklyVolume = strengthLifts
+                .Where(sl => sl.Date >= currentDate && sl.Date <= weekEnd)
+                .Sum(sl => sl.Weight * sl.Reps * sl.Sets);
+
+            volumeData.Add(new ChartDataPoint
+            {
+                Date = currentDate,
+                Value = weeklyVolume
+            });
+
+            currentDate = currentDate.AddDays(7);
+        }
+
+        chartData.AddRange(volumeData);
+    }
+
+    private double GetBarHeight(decimal value, decimal maxValue)
+    {
+        if (maxValue == 0) return 0;
+        return (double)(value / maxValue) * 200; // Max height of 200px
+    }
+
+    private int GetTotalWorkouts()
+    {
+        return (int)chartData.Sum(cd => cd.Value);
+    }
+
+    private decimal GetAveragePerWeek()
+    {
+        if (!chartData.Any()) return 0;
+        return chartData.Average(cd => cd.Value);
+    }
+
+    private int GetCurrentStreak()
+    {
+        // Calculate current workout streak
+        return 0; // TODO: Implement streak calculation
+    }
+
+    private decimal GetTotalVolume()
+    {
+        return chartData.Sum(cd => cd.Value);
+    }
+
+    private decimal GetAverageVolume()
+    {
+        if (!chartData.Any()) return 0;
+        return chartData.Average(cd => cd.Value);
+    }
+
+    private string GetNoDataMessage()
+    {
+        return selectedChartType switch
+        {
+            "strength" => "Complete some strength workouts to see your progress over time.",
+            "workout-frequency" => "Start logging workouts to track your training frequency.",
+            "volume" => "Log strength workouts to see your training volume trends.",
+            _ => "No data available for the selected time period."
+        };
+    }
+
+    private class ChartDataPoint
+    {
+        public DateTime Date { get; set; }
+        public decimal Value { get; set; }
+    }
+}

@@ -1,0 +1,278 @@
+@page "/dashboard"
+@page "/"
+@using LiftTracker.Client.Services
+@using LiftTracker.Application.DTOs
+@inject StateService StateService
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<div class="min-h-screen bg-gray-50">
+    @if (!AuthService.IsAuthenticated)
+    {
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Please log in to continue</h2>
+                <button @onclick="() => Navigation.NavigateTo('/login')"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                    Go to Login
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+                @if (StateService.CurrentUser != null)
+                {
+                    <p class="text-gray-600 mt-2">Welcome back, @StateService.CurrentUser.Name!</p>
+                }
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow px-5 py-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Workouts</dt>
+                                <dd class="text-lg font-medium text-gray-900">@StateService.WorkoutSessions.Count</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow px-5 py-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">This Week</dt>
+                                <dd class="text-lg font-medium text-gray-900">@GetWorkoutsThisWeek()</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow px-5 py-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">This Month</dt>
+                                <dd class="text-lg font-medium text-gray-900">@GetWorkoutsThisMonth()</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow px-5 py-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Progress Score</dt>
+                                <dd class="text-lg font-medium text-gray-900">@GetProgressScore()</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <button @onclick="CreateNewWorkout"
+                            class="bg-indigo-600 text-white p-6 rounded-lg hover:bg-indigo-700 transition-colors">
+                        <svg class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <div class="text-sm font-medium">Start New Workout</div>
+                    </button>
+
+                    <button @onclick="() => StateService.ActiveView = 'progress'"
+                            class="bg-green-600 text-white p-6 rounded-lg hover:bg-green-700 transition-colors">
+                        <svg class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <div class="text-sm font-medium">View Progress</div>
+                    </button>
+
+                    <button @onclick="() => StateService.ActiveView = 'history'"
+                            class="bg-purple-600 text-white p-6 rounded-lg hover:bg-purple-700 transition-colors">
+                        <svg class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="text-sm font-medium">Workout History</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Workouts -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Recent Workouts</h2>
+                    <button @onclick="() => StateService.ActiveView = 'history'"
+                            class="text-indigo-600 hover:text-indigo-500 text-sm font-medium">
+                        View all
+                    </button>
+                </div>
+
+                @if (StateService.IsLoadingWorkoutSessions)
+                {
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-center">
+                            <svg class="animate-spin h-8 w-8 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="ml-2 text-gray-500">Loading workouts...</span>
+                        </div>
+                    </div>
+                }
+                else if (!StateService.WorkoutSessions.Any())
+                {
+                    <div class="bg-white rounded-lg shadow p-6 text-center">
+                        <svg class="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No workouts yet</h3>
+                        <p class="text-gray-500 mb-4">Start tracking your fitness journey today!</p>
+                        <button @onclick="CreateNewWorkout"
+                                class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                            Create First Workout
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach (var workout in StateService.WorkoutSessions.Take(6))
+                        {
+                            <div class="bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow cursor-pointer"
+                                 @onclick="() => ViewWorkout(workout)">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="text-lg font-medium text-gray-900">@workout.Name</h3>
+                                    <span class="text-sm text-gray-500">@workout.Date.ToString("MMM dd")</span>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(workout.Notes))
+                                {
+                                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">@workout.Notes</p>
+                                }
+
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    @if (workout.Duration.HasValue)
+                                    {
+                                        <span>@FormatDuration(workout.Duration.Value)</span>
+                                    }
+                                    else
+                                    {
+                                        <span>No duration</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        if (!AuthService.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        StateService.PropertyChanged += OnStateChanged;
+        StateService.ActiveView = "dashboard";
+        await StateService.InitializeAsync();
+    }
+
+    public void Dispose()
+    {
+        StateService.PropertyChanged -= OnStateChanged;
+    }
+
+    private void OnStateChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CreateNewWorkout()
+    {
+        var createDto = new CreateWorkoutSessionDto
+        {
+            Name = $"Workout {DateTime.Now:MMM dd, yyyy}",
+            Date = DateTime.Now,
+            Notes = string.Empty
+        };
+
+        await StateService.CreateWorkoutSessionAsync(createDto);
+        StateService.ActiveView = "workout";
+    }
+
+    private void ViewWorkout(WorkoutSessionDto workout)
+    {
+        StateService.SelectedWorkoutSession = workout;
+        StateService.ActiveView = "workout";
+    }
+
+    private int GetWorkoutsThisWeek()
+    {
+        var startOfWeek = DateTime.Now.Date.AddDays(-(int)DateTime.Now.DayOfWeek);
+        return StateService.WorkoutSessions.Count(w => w.Date >= startOfWeek);
+    }
+
+    private int GetWorkoutsThisMonth()
+    {
+        var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        return StateService.WorkoutSessions.Count(w => w.Date >= startOfMonth);
+    }
+
+    private string GetProgressScore()
+    {
+        // Simple progress score based on consistency
+        var recentWorkouts = GetWorkoutsThisMonth();
+        var score = Math.Min(100, recentWorkouts * 10);
+        return $"{score}%";
+    }
+
+    private string FormatDuration(TimeSpan duration)
+    {
+        if (duration.TotalHours >= 1)
+        {
+            return $"{duration.Hours}h {duration.Minutes}m";
+        }
+        return $"{duration.Minutes}m";
+    }
+}

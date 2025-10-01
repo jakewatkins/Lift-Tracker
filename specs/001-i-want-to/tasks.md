@@ -122,18 +122,18 @@ Web application structure with clean architecture:
 **T060** ✅ API configuration and startup in src/LiftTracker.API/Program.cs
 
 ## Phase 3.7: Client Layer (Blazor WebAssembly)
-- [ ] T061 [P] Authentication service in src/LiftTracker.Client/Services/AuthService.cs
-- [ ] T062 [P] API client service in src/LiftTracker.Client/Services/ApiClient.cs
-- [ ] T063 [P] State management service in src/LiftTracker.Client/Services/StateService.cs
-- [ ] T064 [P] Login page component in src/LiftTracker.Client/Pages/Login.razor
-- [ ] T065 [P] Dashboard page component in src/LiftTracker.Client/Pages/Dashboard.razor
-- [ ] T066 [P] Workout session form component in src/LiftTracker.Client/Components/WorkoutSessionForm.razor
-- [ ] T067 [P] Strength lift form component in src/LiftTracker.Client/Components/StrengthLiftForm.razor
-- [ ] T068 [P] Metcon workout form component in src/LiftTracker.Client/Components/MetconWorkoutForm.razor
-- [ ] T069 [P] Progress charts component in src/LiftTracker.Client/Components/ProgressCharts.razor
-- [ ] T070 [P] Navigation component in src/LiftTracker.Client/Components/Navigation.razor
-- [ ] T071 [P] Responsive layout with Tailwind CSS in src/LiftTracker.Client/Shared/MainLayout.razor
-- [ ] T072 [P] Client-side routing configuration in src/LiftTracker.Client/App.razor
+- [x] T061 [P] Authentication service in src/LiftTracker.Client/Services/AuthService.cs
+- [x] T062 [P] API client service in src/LiftTracker.Client/Services/ApiClient.cs
+- [x] T063 [P] State management service in src/LiftTracker.Client/Services/StateService.cs
+- [x] T064 [P] Login page component in src/LiftTracker.Client/Pages/Login.razor
+- [x] T065 [P] Dashboard page component in src/LiftTracker.Client/Pages/Dashboard.razor
+- [x] T066 [P] Workout session form component in src/LiftTracker.Client/Components/WorkoutSessionForm.razor
+- [x] T067 [P] Strength lift form component in src/LiftTracker.Client/Components/StrengthLiftForm.razor
+- [x] T068 [P] Metcon workout form component in src/LiftTracker.Client/Components/MetconWorkoutForm.razor
+- [x] T069 [P] Progress charts component in src/LiftTracker.Client/Components/ProgressCharts.razor
+- [x] T070 [P] Navigation component in src/LiftTracker.Client/Components/Navigation.razor
+- [x] T071 [P] Responsive layout with Tailwind CSS in src/LiftTracker.Client/Shared/MainLayout.razor
+- [x] T072 [P] Client-side routing configuration in src/LiftTracker.Client/App.razor
 
 ## Phase 3.8: Integration
 - [ ] T073 Connect all services to repositories with dependency injection
