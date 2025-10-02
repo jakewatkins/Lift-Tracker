@@ -1,5 +1,6 @@
 using LiftTracker.Application.DTOs;
 using LiftTracker.Application.Interfaces;
+using LiftTracker.API.Controllers.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,17 +13,14 @@ namespace LiftTracker.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class UsersController : ControllerBase
+public class UsersController : BaseAuthenticatedController
 {
     private readonly IUserService _userService;
-    private readonly ILogger<UsersController> _logger;
-
     public UsersController(
         IUserService userService,
-        ILogger<UsersController> logger)
+        ILogger<UsersController> logger) : base(logger)
     {
         _userService = userService;
-        _logger = logger;
     }
 
     /// <summary>
@@ -203,17 +201,4 @@ public class UsersController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Helper method to extract current user ID from JWT claims
-    /// </summary>
-    /// <returns>Current user ID or null if not found/invalid</returns>
-    private Guid? GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (Guid.TryParse(userIdClaim, out var userId))
-        {
-            return userId;
-        }
-        return null;
-    }
 }

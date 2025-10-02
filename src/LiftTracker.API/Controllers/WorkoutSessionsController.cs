@@ -2,79 +2,82 @@ using LiftTracker.Application.DTOs;
 using LiftTracker.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace LiftTracker.API.Controllers;
 
 /// <summary>
 /// WorkoutSessions controller for workout session CRUD operations
 /// </summary>
-[ApiController]
-[Route("api/[controller]")]
+[ApiCont}("api/[controller]")]
 [Authorize]
-public class WorkoutSessionsController : ControllerBase
+public class WorkoutSessionsController : BaseAuthenticatedController
 {
     private readonly IWorkoutSessionService _workoutSessionService;
-    private readonly ILogger<WorkoutSessionsController> _logger;
 
     public WorkoutSessionsController(
         IWorkoutSessionService workoutSessionService,
-        ILogger<WorkoutSessionsController> logger)
+        ILogger<WorkoutSessionsController> logger) : base(logger)
     {
         _workoutSessionService = workoutSessionService;
-        _logger = logger;
     }
 
     /// <summary>
     /// Get all workout sessions for the current user
     /// </summary>
-    /// <param name="startDate">Optional start date filter</param>
-    /// <param name="endDate">Optional end date filter</param>
-    /// <param name="limit">Maximum number of sessions to return (default: 50)</param>
-    /// <returns>List of workout sessions</returns>
+    /// <param name="startDate">Optional start date filter (format: YYYY-MM-DD)</param>
+    /// <param name="endDate">Optional end date filter (format: YYYY-MM-DD)</param>
+    /// <param name="limit">Maximum number of sessions to return (default: 50, max: 100)</param>
+    /// <returns>List of workout sessions matching the filter criteria</returns>
+    /// <response code="200">Returns the list of workout sessions</response>
+    /// <response code="401">User is not authenticated</response>
+    /// <response code="500">Internal server error occurred</response>
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetWorkoutSessions(
         [FromQuery] DateOnly? startDate = null,
         [FromQuery] DateOnly? endDate = null,
         [FromQuery] int limit = 50)
     {
-        var userId = GetCurrentUserId();
-        if (userId == null)
-        {
-            return Unauthorized(new { error = "Invalid user token" });
-        }
+        var authResult = ValidateAuthentication();
+        if (authResult.Result != null) return authResult.Result;
+        var userId = authResult.Value;
 
         _logger.LogDebug("Getting workout sessions for user: {UserId}, StartDate: {StartDate}, EndDate: {EndDate}, Limit: {Limit}",
             userId, startDate, endDate, limit);
 
-        try
+        return await ExecuteWithErrorHandling(async () =>
         {
-            var sessions = await _workoutSessionService.GetWorkoutSessionsByUserAsync(userId.Value, startDate, endDate);
+            var sessions = await _workoutSessionService.GetWorkoutSessionsByUserAsync(userId, startDate, endDate);
 
             // Apply limit
             var limitedSessions = sessions.Take(limit);
 
-            return Ok(limitedSessions.Select(session => new
+            return limitedSessions.Select(session => new
             {
                 id = session.Id,
                 userId = session.UserId,
                 date = session.Date,
                 notes = session.Notes
-            }));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting workout sessions for user: {UserId}", userId);
-            return StatusCode(500, new { error = "Failed to retrieve workout sessions" });
-        }
+            });
+        }, "get workout sessions", userId);
     }
 
     /// <summary>
     /// Get a specific workout session by ID
     /// </summary>
-    /// <param name="id">Workout session ID</param>
-    /// <returns>Workout session details</returns>
+    /// <param name="id">Workout session unique identifier (GUID format)</param>
+    /// <returns>Workout session details including associated exercises</returns>
+    /// <response code="200">Returns the workout session details</response>
+    /// <response code="401">User is not authenticated</response>
+    /// <response code="404">Workout session not found or user doesn't have access</response>
+    /// <response code="500">Internal server error occurred</response>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetWorkoutSession(Guid id)
     {
         var userId = GetCurrentUserId();
@@ -112,9 +115,19 @@ public class WorkoutSessionsController : ControllerBase
     /// <summary>
     /// Create a new workout session
     /// </summary>
-    /// <param name="createSessionDto">Workout session data</param>
-    /// <returns>Created workout session</returns>
+    /// <param name="createSessionDto">Workout session creation data</param>
+    /// <returns>Created workout session with generated ID</returns>
+    /// <response code="201">Workout session created successfully</response>
+    /// <response code="400">Invalid input data or validation errors</response>
+    /// <response code="401">User is not authenticated</response>
+    /// <response code="409">Workout session already exists for the specified date</response>
+    /// <response code="500">Internal server error occurred</response>
     [HttpPost]
+    [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateWorkoutSession([FromBody] CreateWorkoutSessionDto createSessionDto)
     {
         var userId = GetCurrentUserId();
@@ -279,19 +292,5 @@ public class WorkoutSessionsController : ControllerBase
             _logger.LogError(ex, "Error getting workout session by date for user: {UserId} on date: {Date}", userId, date);
             return StatusCode(500, new { error = "Failed to retrieve workout session" });
         }
-    }
-
-    /// <summary>
-    /// Helper method to extract current user ID from JWT claims
-    /// </summary>
-    /// <returns>Current user ID or null if not found/invalid</returns>
-    private Guid? GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (Guid.TryParse(userIdClaim, out var userId))
-        {
-            return userId;
-        }
-        return null;
     }
 }

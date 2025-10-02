@@ -11,17 +11,15 @@ namespace LiftTracker.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class ProgressController : ControllerBase
+public class ProgressController : BaseAuthenticatedController
 {
     private readonly IProgressService _progressService;
-    private readonly ILogger<ProgressController> _logger;
 
     public ProgressController(
         IProgressService progressService,
-        ILogger<ProgressController> logger)
+        ILogger<ProgressController> logger) : base(logger)
     {
         _progressService = progressService;
-        _logger = logger;
     }
 
     /// <summary>
@@ -405,17 +403,4 @@ public class ProgressController : ControllerBase
         return new[] { "day", "week", "month" }.Contains(groupBy.ToLower());
     }
 
-    /// <summary>
-    /// Helper method to extract current user ID from JWT claims
-    /// </summary>
-    /// <returns>Current user ID or null if not found/invalid</returns>
-    private Guid? GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (Guid.TryParse(userIdClaim, out var userId))
-        {
-            return userId;
-        }
-        return null;
-    }
 }

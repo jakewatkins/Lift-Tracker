@@ -32,10 +32,14 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Initiate Google OAuth login flow
     /// </summary>
-    /// <param name="returnUrl">URL to redirect to after successful authentication</param>
-    /// <returns>Redirect to Google OAuth</returns>
+    /// <param name="returnUrl">URL to redirect to after successful authentication (optional)</param>
+    /// <returns>Redirect challenge to Google OAuth consent screen</returns>
+    /// <response code="302">Redirects to Google OAuth for authentication</response>
+    /// <response code="500">Internal server error occurred</response>
     [HttpPost("login")]
     [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status302Found)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
     public IActionResult Login([FromQuery] string? returnUrl = null)
     {
         _logger.LogInformation("Initiating Google OAuth login flow");
@@ -51,11 +55,17 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Handle Google OAuth callback
+    /// Handle Google OAuth callback and issue JWT token
     /// </summary>
-    /// <returns>Redirect to application with auth token or error</returns>
+    /// <returns>Redirect to application with authentication token or error information</returns>
+    /// <response code="302">Redirects to application with authentication result</response>
+    /// <response code="400">Authentication failed or incomplete user information</response>
+    /// <response code="500">Internal server error occurred</response>
     [HttpGet("callback")]
     [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status302Found)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Callback()
     {
         _logger.LogInformation("Processing Google OAuth callback");

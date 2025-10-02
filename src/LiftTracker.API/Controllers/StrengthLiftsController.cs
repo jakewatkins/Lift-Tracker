@@ -12,17 +12,15 @@ namespace LiftTracker.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class StrengthLiftsController : ControllerBase
+public class StrengthLiftsController : BaseAuthenticatedController
 {
     private readonly IStrengthLiftService _strengthLiftService;
-    private readonly ILogger<StrengthLiftsController> _logger;
 
     public StrengthLiftsController(
         IStrengthLiftService strengthLiftService,
-        ILogger<StrengthLiftsController> logger)
+        ILogger<StrengthLiftsController> logger) : base(logger)
     {
         _strengthLiftService = strengthLiftService;
-        _logger = logger;
     }
 
     /// <summary>
@@ -352,17 +350,4 @@ public class StrengthLiftsController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Helper method to extract current user ID from JWT claims
-    /// </summary>
-    /// <returns>Current user ID or null if not found/invalid</returns>
-    private Guid? GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (Guid.TryParse(userIdClaim, out var userId))
-        {
-            return userId;
-        }
-        return null;
-    }
 }

@@ -12,17 +12,15 @@ namespace LiftTracker.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class MetconWorkoutsController : ControllerBase
+public class MetconWorkoutsController : BaseAuthenticatedController
 {
     private readonly IMetconWorkoutService _metconWorkoutService;
-    private readonly ILogger<MetconWorkoutsController> _logger;
 
     public MetconWorkoutsController(
         IMetconWorkoutService metconWorkoutService,
-        ILogger<MetconWorkoutsController> logger)
+        ILogger<MetconWorkoutsController> logger) : base(logger)
     {
         _metconWorkoutService = metconWorkoutService;
-        _logger = logger;
     }
 
     /// <summary>
@@ -394,17 +392,4 @@ public class MetconWorkoutsController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Helper method to extract current user ID from JWT claims
-    /// </summary>
-    /// <returns>Current user ID or null if not found/invalid</returns>
-    private Guid? GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (Guid.TryParse(userIdClaim, out var userId))
-        {
-            return userId;
-        }
-        return null;
-    }
 }
