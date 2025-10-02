@@ -8,7 +8,8 @@ namespace LiftTracker.API.Controllers;
 /// <summary>
 /// WorkoutSessions controller for workout session CRUD operations
 /// </summary>
-[ApiCont}("api/[controller]")]
+[ApiController]
+[Route("api/[controller]")]
 [Authorize]
 public class WorkoutSessionsController : BaseAuthenticatedController
 {

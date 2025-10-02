@@ -216,23 +216,28 @@ builder.Services.AddSwaggerGen(options =>
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "LiftTracker API",
-        Version = "v1",
-        Description = "A comprehensive workout tracking API for strength training and metabolic conditioning workouts",
+        Version = "v1.0.0",
+        Description = "A comprehensive workout tracking API for strength training and metabolic conditioning workouts with JWT authentication, caching, and performance monitoring.",
         Contact = new OpenApiContact
         {
-            Name = "LiftTracker Team",
+            Name = "LiftTracker Development Team",
             Email = "support@lifttracker.com"
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT License"
         }
     });
 
     // Configure JWT authentication in Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below. Example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
