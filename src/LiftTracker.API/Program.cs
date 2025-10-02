@@ -150,8 +150,29 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Register repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+// Configure caching services
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 1000; // Limit number of cached items
+    options.CompactionPercentage = 0.25; // Remove 25% when size limit reached
+});
+builder.Services.AddSingleton<LiftTracker.Infrastructure.Caching.ICacheService, LiftTracker.Infrastructure.Caching.MemoryCacheService>();
+
+// Configure response caching
+builder.Services.AddResponseCaching(options =>
+{
+    options.MaximumBodySize = 64 * 1024; // 64KB max response size for caching
+    options.UseCaseSensitivePaths = false;
+});
+
+// Register base repositories
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<IUserRepository>(provider =>
+{
+    var baseRepo = provider.GetRequiredService<UserRepository>();
+    var cacheService = provider.GetRequiredService<LiftTracker.Infrastructure.Caching.ICacheService>();
+    return new LiftTracker.Infrastructure.Repositories.CachedUserRepository(baseRepo, cacheService);
+});
 builder.Services.AddScoped<IWorkoutSessionRepository, WorkoutSessionRepository>();
 builder.Services.AddScoped<IStrengthLiftRepository, StrengthLiftRepository>();
 builder.Services.AddScoped<IMetconWorkoutRepository, MetconWorkoutRepository>();
@@ -163,6 +184,9 @@ builder.Services.AddScoped<IWorkoutSessionService, WorkoutSessionService>();
 builder.Services.AddScoped<IStrengthLiftService, StrengthLiftService>();
 builder.Services.AddScoped<IMetconWorkoutService, MetconWorkoutService>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
+
+// Register enhanced cached services
+builder.Services.AddScoped<LiftTracker.Application.Services.PerformanceOptimizedService>();
 
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(LiftTracker.Application.Mappings.UserMappingProfile));
@@ -252,6 +276,9 @@ if (app.Environment.IsDevelopment())
 // Global error handling middleware (must be first)
 app.UseErrorHandlingMiddleware();
 
+// Add performance monitoring middleware (early in pipeline)
+app.UseMiddleware<LiftTracker.API.Middleware.PerformanceMonitoringMiddleware>();
+
 // Add security headers
 app.UseSecurityHeaders();
 
@@ -290,6 +317,9 @@ app.UseHttpsRedirection();
 
 // CORS middleware
 app.UseCors("AllowBlazorClient");
+
+// Response caching middleware
+app.UseResponseCaching();
 
 // Authentication and authorization
 app.UseAuthentication();

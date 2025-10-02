@@ -135,19 +135,19 @@ Web application structure with clean architecture:
 - [x] T071 [P] Responsive layout with Tailwind CSS in src/LiftTracker.Client/Shared/MainLayout.razor
 - [x] T072 [P] Client-side routing configuration in src/LiftTracker.Client/App.razor
 
-## Phase 3.8: Integration
-- [ ] T073 Connect all services to repositories with dependency injection
-- [ ] T074 Configure EF Core database connection and migrations
-- [ ] T075 Integrate Google OAuth with frontend authentication flow
-- [ ] T076 Configure CORS policy for client-server communication
-- [ ] T077 Setup structured logging with SeriLog across all layers
-- [ ] T078 Configure security headers and HTTPS enforcement
-- [ ] T079 Setup health checks and monitoring endpoints
-- [ ] T080 Configure application settings and environment variables
+## Phase 3.8: Integration ✅ COMPLETE
+- [x] T073 Connect all services to repositories with dependency injection
+- [x] T074 Configure EF Core database connection and migrations
+- [x] T075 Integrate Google OAuth with frontend authentication flow
+- [x] T076 Configure CORS policy for client-server communication
+- [x] T077 Setup structured logging with SeriLog across all layers
+- [x] T078 Configure security headers and HTTPS enforcement
+- [x] T079 Setup health checks and monitoring endpoints
+- [x] T080 Configure application settings and environment variables
 
-## Phase 3.9: Polish
-- [ ] T081 [P] Unit tests for domain entities in tests/LiftTracker.Domain.Tests/
-- [ ] T082 [P] Unit tests for application services in tests/LiftTracker.Application.Tests/
+## Phase 3.9: Polish ✅ IN PROGRESS (29 tests passing)
+- [x] T081 [P] Unit tests for domain entities in tests/LiftTracker.Domain.Tests/ (16 tests ✅)
+- [x] T082 [P] Unit tests for application services in tests/LiftTracker.Application.Tests/ (13 tests ✅)
 - [ ] T083 [P] Unit tests for API controllers in tests/LiftTracker.API.Tests/
 - [ ] T084 [P] Blazor component tests in tests/LiftTracker.Client.Tests/
 - [ ] T085 [P] Performance optimization and caching strategies
