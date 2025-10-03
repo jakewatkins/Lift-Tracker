@@ -1,50 +1,96 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report - v1.0.0
+======================
+Version change: Initial → 1.0.0 (MINOR: Initial constitution creation)
+Modified principles: All principles are new
+Added sections: All sections are new  
+Removed sections: None
+Templates requiring updates:
+✅ plan-template.md (updated Constitution Check reference)
+✅ spec-template.md (aligned with testing and quality requirements)
+✅ tasks-template.md (aligned with TDD and testing discipline)
+Follow-up TODOs: None - all placeholders resolved
+-->
+
+# Lift Tracker Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Clean Architecture & SOLID Principles (NON-NEGOTIABLE)
+All code MUST follow clean architecture patterns with clear separation of concerns.
+SOLID principles are strictly enforced: Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion. 
+Every class and module MUST have a single, well-defined purpose.
+Dependencies MUST flow inward toward the domain core.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+**Automation**: Enforced via Roslyn analyzers, SonarAnalyzer.CSharp, and mandatory architecture tests in CI pipeline.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Test-First Development (NON-NEGOTIABLE)
+TDD mandatory: Unit tests written → Tests fail → Implementation → Green → Refactor.
+Minimum coverage thresholds: 80% unit test coverage, 70% integration test coverage.
+All new features MUST include unit tests, integration tests, and regression test suites.
+No code reaches main branch without passing test gates.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Automation**: Coverage enforced via coverlet and ReportGenerator in GitHub Actions, automatic PR blocks on coverage drops.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. User Experience Consistency
+All UI components MUST follow established design system patterns.
+Accessibility compliance REQUIRED: WCAG 2.1 AA standards minimum.
+Responsive design MANDATORY: Mobile-first approach with breakpoints at 768px, 1024px, 1440px.
+Interaction patterns MUST be consistent across all platforms and features.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Automation**: Automated accessibility testing via axe-core, responsive design validation in Playwright tests, design system compliance via Storybook.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Security-First Implementation
+Secure coding practices MANDATORY: Input validation, output encoding, authentication, authorization.
+All dependencies MUST undergo vulnerability scanning before inclusion.
+Security reviews REQUIRED for all authentication, data handling, and external integration features.
+Regular security audits with automated SAST/DAST scanning in CI/CD pipeline.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Automation**: Snyk vulnerability scanning, CodeQL security analysis, OWASP dependency checking in GitHub workflows.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Performance Excellence
+Load time benchmarks: <2s initial page load, <500ms subsequent navigation.
+Memory usage limits: <100MB baseline, <200MB under load.
+Database queries MUST be optimized: <100ms average response time.
+All performance-critical paths MUST include profiling during development.
+
+**Automation**: Benchmark testing via BenchmarkDotNet, performance monitoring in CI with NBomber load testing, memory profiling integration.
+
+## Quality Assurance Standards
+
+### Naming Conventions & Code Style
+C# naming conventions strictly enforced: PascalCase for public members, camelCase for private fields.
+EditorConfig and .editorconfig files MUST be maintained and enforced.
+Code style violations automatically caught in pre-commit hooks and CI builds.
+Documentation REQUIRED for all public APIs using XML documentation comments.
+
+### Dependency Management
+All NuGet packages MUST be explicitly versioned (no floating versions).
+Regular dependency updates scheduled monthly with security updates prioritized.
+New dependencies require architectural review and security clearance.
+Package reference consolidation to minimize dependency conflicts.
+
+## CI/CD Integration Requirements
+
+### GitHub Workflows Integration
+All constitutional principles MUST be enforceable via GitHub Actions workflows.
+Automated checks for: code quality (SonarCloud), security (CodeQL), performance (benchmarks), accessibility (axe).
+PR review requirements: automated tests pass, code coverage maintained, security scans clear.
+Deployment gates: staging environment validation, performance regression checks.
+
+### Spec Kit Policy Enforcement
+Constitution compliance integrated with Spec Kit policy validation.
+All feature specifications MUST reference applicable constitutional principles.
+Implementation plans MUST include constitutional compliance verification steps.
+Task breakdowns MUST incorporate quality gates defined in this constitution.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This Constitution supersedes all other development practices and coding standards.
+Constitutional amendments require majority team approval and formal documentation.
+All pull requests MUST verify constitutional compliance before merge approval.
+Architectural decisions contradicting constitutional principles require explicit constitution amendment.
+Regular constitution reviews scheduled quarterly to ensure continued relevance and effectiveness.
+Development teams MUST reference this constitution during feature planning, implementation, and review processes.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-09-28 | **Last Amended**: 2025-09-28

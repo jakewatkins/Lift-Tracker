@@ -1,0 +1,896 @@
+openapi: 3.0.3
+info:
+  title: Lift Tracker API
+  description: REST API for workout tracking application
+  version: 1.0.0
+  contact:
+    name: Lift Tracker Team
+servers:
+  - url: https://api.lifttracker.com/v1
+    description: Production server
+  - url: https://localhost:7001/api
+    description: Development server
+
+security:
+  - GoogleOAuth: []
+
+paths:
+  # Authentication endpoints
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Initiate Google OAuth login
+      responses:
+        '302':
+          description: Redirect to Google OAuth
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/callback:
+    get:
+      tags: [Authentication]
+      summary: Handle Google OAuth callback
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to application with auth token
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/profile:
+    get:
+      tags: [Authentication]
+      summary: Get current user profile
+      responses:
+        '200':
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Workout Session endpoints
+  /workout-sessions:
+    get:
+      tags: [Workout Sessions]
+      summary: Get user's workout sessions
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: List of workout sessions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutSessionList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags: [Workout Sessions]
+      summary: Create new workout session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkoutSession'
+      responses:
+        '201':
+          description: Workout session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutSession'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /workout-sessions/{sessionId}:
+    get:
+      tags: [Workout Sessions]
+      summary: Get specific workout session with exercises
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workout session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutSessionDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags: [Workout Sessions]
+      summary: Update workout session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkoutSession'
+      responses:
+        '200':
+          description: Workout session updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutSession'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      tags: [Workout Sessions]
+      summary: Delete workout session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Workout session deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Strength Lift endpoints
+  /workout-sessions/{sessionId}/strength-lifts:
+    post:
+      tags: [Strength Lifts]
+      summary: Add strength lift to workout session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStrengthLift'
+      responses:
+        '201':
+          description: Strength lift created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrengthLift'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /strength-lifts/{liftId}:
+    put:
+      tags: [Strength Lifts]
+      summary: Update strength lift
+      parameters:
+        - name: liftId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStrengthLift'
+      responses:
+        '200':
+          description: Strength lift updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrengthLift'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      tags: [Strength Lifts]
+      summary: Delete strength lift
+      parameters:
+        - name: liftId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Strength lift deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Metcon Workout endpoints
+  /workout-sessions/{sessionId}/metcon-workouts:
+    post:
+      tags: [Metcon Workouts]
+      summary: Add metcon workout to session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMetconWorkout'
+      responses:
+        '201':
+          description: Metcon workout created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetconWorkout'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /metcon-workouts/{metconId}:
+    put:
+      tags: [Metcon Workouts]
+      summary: Update metcon workout
+      parameters:
+        - name: metconId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMetconWorkout'
+      responses:
+        '200':
+          description: Metcon workout updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetconWorkout'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      tags: [Metcon Workouts]
+      summary: Delete metcon workout
+      parameters:
+        - name: metconId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Metcon workout deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Reference Data endpoints
+  /exercise-types:
+    get:
+      tags: [Reference Data]
+      summary: Get available exercise types
+      responses:
+        '200':
+          description: List of exercise types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExerciseType'
+
+  /metcon-types:
+    get:
+      tags: [Reference Data]
+      summary: Get available metcon types
+      responses:
+        '200':
+          description: List of metcon types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetconType'
+
+  /movement-types:
+    get:
+      tags: [Reference Data]
+      summary: Get available movement types
+      responses:
+        '200':
+          description: List of movement types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovementType'
+
+  # Progress endpoints
+  /progress/strength-lifts:
+    get:
+      tags: [Progress]
+      summary: Get strength lift progress data
+      parameters:
+        - name: exerciseTypeId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: days
+          in: query
+          schema:
+            type: integer
+            enum: [30, 60, 90]
+            default: 30
+      responses:
+        '200':
+          description: Progress data for specified exercise
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrengthLiftProgress'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /progress/metcon-workouts:
+    get:
+      tags: [Progress]
+      summary: Get metcon workout progress data
+      parameters:
+        - name: metconTypeId
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: days
+          in: query
+          schema:
+            type: integer
+            enum: [30, 60, 90]
+            default: 30
+      responses:
+        '200':
+          description: Progress data for specified metcon type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetconWorkoutProgress'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    GoogleOAuth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://accounts.google.com/o/oauth2/auth
+          tokenUrl: https://oauth2.googleapis.com/token
+          scopes:
+            openid: OpenID Connect
+            email: Access to email address
+            profile: Access to profile information
+
+  schemas:
+    UserProfile:
+      type: object
+      required: [id, email, name, createdDate]
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          maxLength: 100
+        createdDate:
+          type: string
+          format: date-time
+        lastLoginDate:
+          type: string
+          format: date-time
+
+    WorkoutSession:
+      type: object
+      required: [id, userId, date, createdDate, modifiedDate]
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        notes:
+          type: string
+          maxLength: 1000
+        createdDate:
+          type: string
+          format: date-time
+        modifiedDate:
+          type: string
+          format: date-time
+
+    WorkoutSessionDetail:
+      allOf:
+        - $ref: '#/components/schemas/WorkoutSession'
+        - type: object
+          properties:
+            strengthLifts:
+              type: array
+              items:
+                $ref: '#/components/schemas/StrengthLift'
+            metconWorkouts:
+              type: array
+              items:
+                $ref: '#/components/schemas/MetconWorkout'
+
+    WorkoutSessionList:
+      type: object
+      required: [sessions, totalCount, page, pageSize]
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkoutSession'
+        totalCount:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    CreateWorkoutSession:
+      type: object
+      required: [date]
+      properties:
+        date:
+          type: string
+          format: date
+        notes:
+          type: string
+          maxLength: 1000
+
+    UpdateWorkoutSession:
+      type: object
+      properties:
+        notes:
+          type: string
+          maxLength: 1000
+
+    ExerciseType:
+      type: object
+      required: [id, name, category, isActive]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          maxLength: 100
+        category:
+          type: string
+          maxLength: 50
+        isActive:
+          type: boolean
+
+    StrengthLift:
+      type: object
+      required: [id, workoutSessionId, exerciseTypeId, setStructure, weight, order]
+      properties:
+        id:
+          type: string
+          format: uuid
+        workoutSessionId:
+          type: string
+          format: uuid
+        exerciseTypeId:
+          type: integer
+        exerciseType:
+          $ref: '#/components/schemas/ExerciseType'
+        setStructure:
+          type: string
+          enum: [SetsReps, EMOM, AMRAP, TimeBased]
+        sets:
+          type: integer
+          minimum: 1
+          maximum: 50
+        reps:
+          type: integer
+          minimum: 1
+          maximum: 500
+        weight:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        additionalWeight:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        duration:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        restPeriod:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        comments:
+          type: string
+          maxLength: 500
+        order:
+          type: integer
+          minimum: 1
+
+    CreateStrengthLift:
+      type: object
+      required: [exerciseTypeId, setStructure, weight]
+      properties:
+        exerciseTypeId:
+          type: integer
+        setStructure:
+          type: string
+          enum: [SetsReps, EMOM, AMRAP, TimeBased]
+        sets:
+          type: integer
+          minimum: 1
+          maximum: 50
+        reps:
+          type: integer
+          minimum: 1
+          maximum: 500
+        weight:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        additionalWeight:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        duration:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        restPeriod:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        comments:
+          type: string
+          maxLength: 500
+
+    UpdateStrengthLift:
+      $ref: '#/components/schemas/CreateStrengthLift'
+
+    MetconType:
+      type: object
+      required: [id, name, isActive]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 200
+        isActive:
+          type: boolean
+
+    MovementType:
+      type: object
+      required: [id, name, category, measurementType, isActive]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          maxLength: 100
+        category:
+          type: string
+          maxLength: 50
+        measurementType:
+          type: string
+          enum: [Reps, Distance]
+        isActive:
+          type: boolean
+
+    MetconWorkout:
+      type: object
+      required: [id, workoutSessionId, metconTypeId, order]
+      properties:
+        id:
+          type: string
+          format: uuid
+        workoutSessionId:
+          type: string
+          format: uuid
+        metconTypeId:
+          type: integer
+        metconType:
+          $ref: '#/components/schemas/MetconType'
+        totalTime:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        roundsCompleted:
+          type: integer
+          minimum: 0
+          maximum: 1000
+        notes:
+          type: string
+          maxLength: 1000
+        order:
+          type: integer
+          minimum: 1
+        movements:
+          type: array
+          items:
+            $ref: '#/components/schemas/MetconMovement'
+
+    MetconMovement:
+      type: object
+      required: [id, metconWorkoutId, movementTypeId, order]
+      properties:
+        id:
+          type: string
+          format: uuid
+        metconWorkoutId:
+          type: string
+          format: uuid
+        movementTypeId:
+          type: integer
+        movementType:
+          $ref: '#/components/schemas/MovementType'
+        reps:
+          type: integer
+          minimum: 1
+          maximum: 10000
+        distance:
+          type: number
+          format: decimal
+          minimum: 0
+        weight:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        order:
+          type: integer
+          minimum: 1
+
+    CreateMetconWorkout:
+      type: object
+      required: [metconTypeId]
+      properties:
+        metconTypeId:
+          type: integer
+        totalTime:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+        roundsCompleted:
+          type: integer
+          minimum: 0
+          maximum: 1000
+        notes:
+          type: string
+          maxLength: 1000
+        movements:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateMetconMovement'
+
+    CreateMetconMovement:
+      type: object
+      required: [movementTypeId]
+      properties:
+        movementTypeId:
+          type: integer
+        reps:
+          type: integer
+          minimum: 1
+          maximum: 10000
+        distance:
+          type: number
+          format: decimal
+          minimum: 0
+        weight:
+          type: number
+          format: decimal
+          minimum: 0
+          multipleOf: 0.25
+
+    UpdateMetconWorkout:
+      $ref: '#/components/schemas/CreateMetconWorkout'
+
+    StrengthLiftProgress:
+      type: object
+      required: [exerciseType, dataPoints]
+      properties:
+        exerciseType:
+          $ref: '#/components/schemas/ExerciseType'
+        dataPoints:
+          type: array
+          items:
+            type: object
+            required: [date, maxWeight, totalVolume]
+            properties:
+              date:
+                type: string
+                format: date
+              maxWeight:
+                type: number
+                format: decimal
+              totalVolume:
+                type: number
+                format: decimal
+              sets:
+                type: integer
+              reps:
+                type: integer
+
+    MetconWorkoutProgress:
+      type: object
+      required: [metconType, dataPoints]
+      properties:
+        metconType:
+          $ref: '#/components/schemas/MetconType'
+        dataPoints:
+          type: array
+          items:
+            type: object
+            required: [date, totalTime]
+            properties:
+              date:
+                type: string
+                format: date
+              totalTime:
+                type: number
+                format: decimal
+              roundsCompleted:
+                type: integer
+
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -76,6 +76,14 @@
 - [ ] T022 Remove duplication
 - [ ] T023 Run manual-testing.md
 
+## Phase 3.6: Constitutional Compliance
+- [ ] T024 [P] Run architecture tests for clean architecture compliance
+- [ ] T025 [P] Verify test coverage thresholds (80% unit, 70% integration)
+- [ ] T026 [P] Security scan with SAST/dependency checking
+- [ ] T027 [P] Performance benchmark validation
+- [ ] T028 [P] Accessibility compliance check (if UI feature)
+- [ ] T029 [P] Code style and naming convention validation
+
 ## Dependencies
 - Tests (T004-T007) before implementation (T008-T014)
 - T008 blocks T009, T015
@@ -125,3 +133,4 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 - [ ] Parallel tasks truly independent
 - [ ] Each task specifies exact file path
 - [ ] No task modifies same file as another [P] task
+- [ ] Constitutional compliance tasks included for quality gates

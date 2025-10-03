@@ -100,6 +100,12 @@ When creating this spec from a user prompt:
 - [ ] Scope is clearly bounded
 - [ ] Dependencies and assumptions identified
 
+### Constitutional Compliance
+- [ ] Security requirements specified for data handling and authentication features
+- [ ] Performance benchmarks defined for user-facing functionality
+- [ ] Accessibility requirements noted for UI features
+- [ ] Testing approach considerations included for complex features
+
 ---
 
 ## Execution Status
