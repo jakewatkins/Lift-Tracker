@@ -1,6 +1,0 @@
-{
-  "LiftTracker.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/jakewatkins\/source\/trashcode\/speckit-test1\/lift-tracker\/src\/LiftTracker.API",
-  "LiftTracker.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/jakewatkins\/source\/trashcode\/speckit-test1\/lift-tracker\/src\/LiftTracker.Application",
-  "LiftTracker.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/jakewatkins\/source\/trashcode\/speckit-test1\/lift-tracker\/src\/LiftTracker.Domain",
-  "LiftTracker.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/Users\/jakewatkins\/source\/trashcode\/speckit-test1\/lift-tracker\/src\/LiftTracker.Infrastructure"
-}
